@@ -23,6 +23,6 @@
     "url": "https://github.com/realitycollective"
   },
   "dependencies": {
-    "services.core": "1.4.0"
+    "com.unity.services.core": "1.4.0"
   }
 }
