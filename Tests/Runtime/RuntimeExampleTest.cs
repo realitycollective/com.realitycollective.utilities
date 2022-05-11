@@ -1,4 +1,4 @@
-﻿// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Package Runtime Tests.
 // Test Framework
 // https://docs.unity3d.com/Manual/com.unity.test-framework.html
@@ -12,7 +12,7 @@ using NUnit.Framework;
 using System.Collections;
 using UnityEngine;
 
-namespace RealityToolkit.UPMTEMPLATE.Tests
+namespace RealityToolkit.utilities.Tests
 {
     class RuntimeExampleTest
     {

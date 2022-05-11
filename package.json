@@ -1,12 +1,10 @@
 {
-  "name": "com.realitytoolkit.UPMTEMPLATE",
-  "displayName": "RealityToolkit.UPMTEMPLATE",
-  "description": "The UPMTEMPLATE framework of the Reality Toolkit by the Reality Collective",
+  "name": "com.realitytoolkit.utilities",
+  "displayName": "RealityToolkit.Utilities",
+  "description": "A collection of useful utilities for Unity Projects by the Reality Collective",
   "keywords": [
-    "VR",
-    "AR",
-    "XR",
-    "Mixed Reality"
+    "Unity",
+    "Tools"
   ],
   "version": "1.0.0-preview.0",
   "unity": "2020.3",
@@ -17,7 +15,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/realitycollective/com.realitytoolkit.UPMTEMPLATE"
+    "url": "git+https://github.com/realitycollective/com.realitytoolkit.utilities"
   },
   "author": {
     "name": "Reality Collective",
@@ -25,12 +23,6 @@
     "url": "https://github.com/realitycollective"
   },
   "dependencies": {
-    "com.realitytoolkit.core": "1.0.0-preview.1"
-  },
-  "assets": [
-    {
-      "displayName": "Default Assets",
-      "path": "Assets~/"
-    }
-  ]
+    "com.realitytoolkit.core": "1.0.0-preview.3"
+  }
 }

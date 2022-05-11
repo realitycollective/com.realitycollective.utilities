@@ -1,9 +1,9 @@
 {
-    "name": "RealityToolkit.UPMTEMPLATE.Editor.Tests",
+    "name": "RealityToolkit.utilities.Editor.Tests",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "RealityToolkit.UPMTEMPLATE"
+        "RealityToolkit.utilities"
     ],
     "includePlatforms": [
         "Editor"

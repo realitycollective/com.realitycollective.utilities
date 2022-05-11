@@ -4,15 +4,15 @@
 using UnityEngine;
 using XRTK.Editor.Utilities;
 
-namespace RealityToolkit.UPMTEMPLATE.Editor
+namespace RealityToolkit.utilities.Editor
 {
     /// <summary>
     /// Dummy scriptable object used to find the relative path of the platform package.
     /// </summary>
     ///// <inheritdoc cref="IPathFinder" />
-    public class UPMTEMPLATEPathFinder : ScriptableObject, IPathFinder
+    public class utilitiesPathFinder : ScriptableObject, IPathFinder
     {
         ///// <inheritdoc />
-        public string Location => $"/Editor/{nameof(UPMTEMPLATEPathFinder)}.cs";
+        public string Location => $"/Editor/{nameof(utilitiesPathFinder)}.cs";
     }
 }

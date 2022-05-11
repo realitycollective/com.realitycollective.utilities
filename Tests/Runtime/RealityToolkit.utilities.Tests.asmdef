@@ -1,5 +1,5 @@
 {
-    "name": "RealityToolkit.UPMTEMPLATE.Tests",
+    "name": "RealityToolkit.utilities.Tests",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"

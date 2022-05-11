@@ -1,6 +1,6 @@
 {
-    "name": "RealityToolkit.UPMTEMPLATE.Editor",
-    "rootNamespace": "RealityToolkit.UPMTEMPLATE.Editor",
+    "name": "RealityToolkit.utilities.Editor",
+    "rootNamespace": "RealityToolkit.utilities.Editor",
     "references": [
         "GUID:e67d30660ec243e4836aac191d3f36fb",
         "GUID:f3241d040533491e8a1e2714b27c3111"
