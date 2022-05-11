@@ -23,6 +23,6 @@
     "url": "https://github.com/realitycollective"
   },
   "dependencies": {
-    "com.realitytoolkit.core": "1.0.0-preview.3"
+    "services.core": "1.4.0"
   }
 }
