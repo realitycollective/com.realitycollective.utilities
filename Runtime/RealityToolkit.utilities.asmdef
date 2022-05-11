@@ -1,12 +1,13 @@
 {
-    "name": "RealityToolkit.utilities",
-    "rootNamespace": "RealityToolkit.utilities",
+    "name": "RealityToolkit.Utilities",
+    "rootNamespace": "RealityToolkit.Utilities",
     "references": [
-        "GUID:f3241d040533491e8a1e2714b27c3111"
+        "GUID:478a2357cc57436488a56e564b08d223",
+        "GUID:84651a3751eca9349aac36a66bba901b"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
-    "allowUnsafeCode": false,
+    "allowUnsafeCode": true,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,

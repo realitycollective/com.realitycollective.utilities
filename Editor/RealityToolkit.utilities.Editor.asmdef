@@ -1,9 +1,8 @@
 {
-    "name": "RealityToolkit.utilities.Editor",
-    "rootNamespace": "RealityToolkit.utilities.Editor",
+    "name": "RealityToolkit.Utilities.Editor",
+    "rootNamespace": "RealityToolkit.Utilities.Editor",
     "references": [
-        "GUID:e67d30660ec243e4836aac191d3f36fb",
-        "GUID:f3241d040533491e8a1e2714b27c3111"
+        "GUID:b2d046948d6452a4b8485efc9ce0f88c"
     ],
     "includePlatforms": [
         "Editor"

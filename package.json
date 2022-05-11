@@ -11,7 +11,7 @@
   "homepage": "https://github.com/realitycollective",
   "bugs": {
     "url": "https://github.com/realitycollective/realitytoolkit.dev/issues"
-  },  
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
     "url": "https://github.com/realitycollective"
   },
   "dependencies": {
-    "com.unity.services.core": "1.4.0"
+    "com.unity.editorcoroutines": "1.0.0",
+    "com.unity.modules.unitywebrequest": "1.0.0"
   }
 }
