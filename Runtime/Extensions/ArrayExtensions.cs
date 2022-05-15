@@ -76,5 +76,32 @@ namespace RealityToolkit.Extensions
 
             return array;
         }
+
+        /// <summary>
+        /// Provides a List style Contains search for an array containing <see cref="IComparable"/> Items
+        /// </summary>
+        /// <typeparam name="T">The type of data contained with the array</typeparam>
+        /// <param name="array">The Array of items to search</param>
+        /// <param name="item">The item to search for in the array</param>
+        /// <returns></returns>
+        public static bool Contains<T>(this T[] array, T item) where T : IComparable<T>
+        {
+            if (array == null || array.Length == 0)
+            {
+                return false;
+            }
+            bool isFound = false;
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (array[i].CompareTo(item) == 0)
+                {
+                    isFound = true;
+                    break;
+                }
+            }
+
+            return isFound;
+        }
     }
 }
