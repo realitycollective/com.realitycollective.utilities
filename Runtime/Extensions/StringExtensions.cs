@@ -7,7 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
 
-namespace RealityToolkit.Extensions
+namespace RealityCollective.Extensions
 {
     /// <summary>
     /// <see cref="string"/> Extensions.

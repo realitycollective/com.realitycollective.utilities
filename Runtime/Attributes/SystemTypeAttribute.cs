@@ -2,10 +2,10 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
-using RealityToolkit.Definitions.Utilities;
+using RealityCollective.Definitions.Utilities;
 using UnityEngine;
 
-namespace RealityToolkit.Attributes
+namespace RealityCollective.Attributes
 {
     /// <summary>
     /// Base class for class selection constraints that can be applied when selecting

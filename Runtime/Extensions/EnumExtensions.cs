@@ -3,7 +3,7 @@
 
 using System;
 
-namespace RealityToolkit.Extensions
+namespace RealityCollective.Extensions
 {
     /// <summary>
     /// Casts an enum to an int using pointers.

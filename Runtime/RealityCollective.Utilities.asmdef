@@ -1,6 +1,6 @@
 {
-    "name": "RealityToolkit.Utilities",
-    "rootNamespace": "RealityToolkit.Utilities",
+    "name": "RealityCollective.Utilities",
+    "rootNamespace": "RealityCollective.Utilities",
     "references": [
         "GUID:478a2357cc57436488a56e564b08d223",
         "GUID:84651a3751eca9349aac36a66bba901b"

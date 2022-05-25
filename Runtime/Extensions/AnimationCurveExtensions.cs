@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace RealityToolkit.Extensions
+namespace RealityCollective.Extensions
 {
     /// <summary>
     /// Extension methods for Unity's AnimationCurve class

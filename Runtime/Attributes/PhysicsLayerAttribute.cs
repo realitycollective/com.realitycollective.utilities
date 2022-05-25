@@ -4,7 +4,7 @@
 using System;
 using UnityEngine;
 
-namespace RealityToolkit.Attributes
+namespace RealityCollective.Attributes
 {
     /// <summary>
     /// Attribute used to make an <see cref="int"/> field render a dropdown generated from the current layers defined in the Tag Manager.

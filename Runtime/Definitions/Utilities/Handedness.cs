@@ -3,7 +3,7 @@
 
 using System;
 
-namespace RealityToolkit.Definitions.Utilities
+namespace RealityCollective.Definitions.Utilities
 {
     /// <summary>
     /// The Handedness defines which hand a controller is currently operating in.

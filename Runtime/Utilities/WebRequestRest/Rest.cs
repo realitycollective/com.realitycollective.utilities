@@ -8,13 +8,13 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using RealityToolkit.Utilities.Async;
+using RealityCollective.Utilities.Async;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.ResourceManagement.ResourceProviders;
-using RealityToolkit.Extensions;
+using RealityCollective.Extensions;
 
-namespace RealityToolkit.Utilities.WebRequestRest
+namespace RealityCollective.Utilities.WebRequestRest
 {
     /// <summary>
     /// REST Class for CRUD Transactions.

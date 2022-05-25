@@ -7,9 +7,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using RealityToolkit.Definitions.Utilities;
+using RealityCollective.Definitions.Utilities;
 
-namespace RealityToolkit.Extensions
+namespace RealityCollective.Extensions
 {
     /// <summary>
     /// <see cref="Process"/> Extension class.

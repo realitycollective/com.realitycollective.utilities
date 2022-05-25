@@ -23,9 +23,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using RealityToolkit.Utilities.Async.AwaitYieldInstructions;
+using RealityCollective.Utilities.Async.AwaitYieldInstructions;
 
-namespace RealityToolkit.Utilities.Async
+namespace RealityCollective.Utilities.Async
 {
     /// <summary>
     /// Utility class to provide custom awaiters.

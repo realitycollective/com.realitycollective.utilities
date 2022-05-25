@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace RealityToolkit.Extensions
+namespace RealityCollective.Extensions
 {
     /// <summary>
     /// Extension methods and helper functions for various math data

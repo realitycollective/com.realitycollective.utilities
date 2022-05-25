@@ -3,9 +3,9 @@
 
 using System;
 using System.Linq;
-using RealityToolkit.Definitions.Utilities;
+using RealityCollective.Definitions.Utilities;
 
-namespace RealityToolkit.Attributes
+namespace RealityCollective.Attributes
 {
     /// <summary>
     /// Constraint that allows selection of classes that implement a specific interface

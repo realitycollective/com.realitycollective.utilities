@@ -5,7 +5,7 @@ using System;
 using System.Globalization;
 using UnityEngine;
 
-namespace RealityToolkit.Extensions
+namespace RealityCollective.Extensions
 {
     /// <summary>
     /// Extension methods for Unity's Color32 struct

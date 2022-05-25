@@ -2,10 +2,10 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System.Threading.Tasks;
-using RealityToolkit.Utilities.Async;
+using RealityCollective.Utilities.Async;
 using UnityEngine;
 
-namespace RealityToolkit.Extensions
+namespace RealityCollective.Extensions
 {
     /// <summary>
     /// <see cref="Texture"/> and <see cref="Texture2D"/> Extensions.

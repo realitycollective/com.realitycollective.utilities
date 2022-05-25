@@ -2,10 +2,10 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
-using RealityToolkit.Extensions;
+using RealityCollective.Extensions;
 using UnityEngine;
 
-namespace RealityToolkit.Editor.Utilities
+namespace RealityCollective.Editor.Utilities
 {
     public static class LayerUtilities
     {

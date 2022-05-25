@@ -4,7 +4,7 @@
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace RealityToolkit.Extensions
+namespace RealityCollective.Extensions
 {
     /// <summary>
     /// Extension methods for Unity's Object class

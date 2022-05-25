@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Hardware;
 
-namespace RealityToolkit.Editor.Utilities.USB
+namespace RealityCollective.Editor.Utilities.USB
 {
     [InitializeOnLoad]
     public class USBDeviceListener

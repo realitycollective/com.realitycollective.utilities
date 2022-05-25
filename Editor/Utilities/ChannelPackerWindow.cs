@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Reality Collective. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using RealityToolkit.Utilities.Editor;
+using RealityCollective.Utilities.Editor;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace RealityToolkit.Editor.Utilities
+namespace RealityCollective.Editor.Utilities
 {
     public class ChannelPackerWindow : EditorWindow
     {
