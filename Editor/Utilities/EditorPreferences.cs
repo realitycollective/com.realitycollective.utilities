@@ -4,7 +4,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace RealityToolkit.Editor.Utilities
+namespace RealityCollective.Editor.Utilities
 {
     /// <summary>
     /// Convenience class for setting Editor Preferences with <see cref="Application.productName"/> as key prefix.

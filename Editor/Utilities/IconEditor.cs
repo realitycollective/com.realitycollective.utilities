@@ -5,7 +5,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace RealityToolkit.Editor.Utilities
+namespace RealityCollective.Editor.Utilities
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(DefaultAsset))]

@@ -20,9 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using RealityToolkit.Extensions;
-using RealityToolkit.Utilities.Async.AwaitYieldInstructions;
-using RealityToolkit.Utilities.Async.Internal;
+using RealityCollective.Extensions;
+using RealityCollective.Utilities.Async.AwaitYieldInstructions;
+using RealityCollective.Utilities.Async.Internal;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -36,7 +36,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace RealityToolkit.Utilities.Async
+namespace RealityCollective.Utilities.Async
 {
     /// <summary>
     /// We could just add a generic GetAwaiter to YieldInstruction and CustomYieldInstruction

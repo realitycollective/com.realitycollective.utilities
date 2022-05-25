@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace RealityToolkit.Extensions
+namespace RealityCollective.Extensions
 {
     public static class CollisionExtensions
     {

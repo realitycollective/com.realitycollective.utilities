@@ -3,7 +3,7 @@
 
 using System;
 
-namespace RealityToolkit.Editor.Utilities.USB
+namespace RealityCollective.Editor.Utilities.USB
 {
     [Serializable]
     public class USBDeviceInfo

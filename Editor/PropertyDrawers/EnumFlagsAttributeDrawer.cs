@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using RealityToolkit.Attributes;
+using RealityCollective.Attributes;
 using UnityEditor;
 using UnityEngine;
 
-namespace RealityToolkit.Editor.PropertyDrawers
+namespace RealityCollective.Editor.PropertyDrawers
 {
     /// <summary>
     /// Renders enum flags on fields with the attribute.

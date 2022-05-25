@@ -8,9 +8,9 @@ using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEditorInternal;
 using UnityEngine;
-using RealityToolkit.Extensions;
+using RealityCollective.Extensions;
 
-namespace RealityToolkit.Editor.Utilities
+namespace RealityCollective.Editor.Utilities
 {
     public static class AssemblyDefinitionEditorExtension
     {

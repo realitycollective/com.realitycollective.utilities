@@ -1,14 +1,14 @@
 ﻿// Copyright (c) XRTK. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.﻿
 
-using RealityToolkit.Utilities;
+using RealityCollective.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Debug = UnityEngine.Debug;
 
-namespace RealityToolkit.Extensions
+namespace RealityCollective.Extensions
 {
     public static class TypeExtensions
     {

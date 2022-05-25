@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace RealityToolkit.Extensions
+namespace RealityCollective.Extensions
 {
     /// <summary>
     /// Extension methods for the .Net IEnumerable class

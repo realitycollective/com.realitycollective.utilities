@@ -4,7 +4,7 @@
 using System;
 using UnityEngine;
 
-namespace RealityToolkit.Definitions.Utilities
+namespace RealityCollective.Definitions.Utilities
 {
     [Serializable]
     public struct QuaternionSmoothed

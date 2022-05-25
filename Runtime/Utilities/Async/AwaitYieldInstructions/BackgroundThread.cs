@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace RealityToolkit.Utilities.Async.AwaitYieldInstructions
+namespace RealityCollective.Utilities.Async.AwaitYieldInstructions
 {
     /// <summary>
     /// Helper class for continuing executions on a background thread.

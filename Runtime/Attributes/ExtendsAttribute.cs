@@ -2,9 +2,9 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
-using RealityToolkit.Definitions.Utilities;
+using RealityCollective.Definitions.Utilities;
 
-namespace RealityToolkit.Attributes
+namespace RealityCollective.Attributes
 {
     /// <summary>
     /// Constraint that allows selection of classes that extend a specific class when
