@@ -146,7 +146,7 @@ namespace RealityCollective.Utilities.Async
             return awaiter;
         }
 
-        private static void RunCoroutine(IEnumerator enumerator)
+        public static void RunCoroutine(IEnumerator enumerator)
         {
             if (Application.isPlaying)
             {

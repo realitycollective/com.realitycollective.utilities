@@ -96,6 +96,12 @@ namespace RealityCollective.Extensions
             => value.Substring(value.BackSlashes().LastIndexOf(Path.DirectorySeparatorChar) + 1, value.Length - value.BackSlashes().LastIndexOf(Path.DirectorySeparatorChar) - 1);
 
         /// <summary>
+        /// Returns a filename without its extenion
+        /// </summary>
+        public static string FilenameWithoutExtension(this string value)
+            => value.Substring(value.BackSlashes().LastIndexOf(Path.DirectorySeparatorChar) + 1, value.Length - value.BackSlashes().LastIndexOf(Path.DirectorySeparatorChar) - (value.Length - value.BackSlashes().LastIndexOf('.')) - 1);
+
+        /// <summary>
         /// Creates a relative path from one file or folder to another.
         /// </summary>
         /// <param name="fromPath">Contains the directory that defines the start of the relative path.</param>
