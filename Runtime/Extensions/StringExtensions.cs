@@ -33,8 +33,7 @@ namespace RealityCollective.Extensions
             => Encoding.ASCII.GetString(Convert.FromBase64String(encodedData));
 
         /// <summary>
-        /// Capitalize the first character and add a space before
-        /// each capitalized letter (except the first character).
+        /// Capitalize the first character and add a space before each capitalized letter (except the first character).
         /// </summary>
         /// <param name="value"></param>
         public static string ToProperCase(this string value)
@@ -90,13 +89,13 @@ namespace RealityCollective.Extensions
             => value.Substring(0, value.BackSlashes().LastIndexOf(Path.DirectorySeparatorChar) + 1);
 
         /// <summary>
-        /// Returns the filename from a URI path
+        /// Returns the filename from a URI path.
         /// </summary>
         public static string FilenameFromURI(this string value)
             => value.Substring(value.BackSlashes().LastIndexOf(Path.DirectorySeparatorChar) + 1, value.Length - value.BackSlashes().LastIndexOf(Path.DirectorySeparatorChar) - 1);
 
         /// <summary>
-        /// Returns a filename without its extenion
+        /// Returns a filename without its extenion.
         /// </summary>
         public static string FilenameWithoutExtension(this string value)
             => Path.GetFileNameWithoutExtension(value);
