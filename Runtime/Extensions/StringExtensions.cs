@@ -99,7 +99,7 @@ namespace RealityCollective.Extensions
         /// Returns a filename without its extenion
         /// </summary>
         public static string FilenameWithoutExtension(this string value)
-            => value.Substring(value.BackSlashes().LastIndexOf(Path.DirectorySeparatorChar) + 1, value.Length - value.BackSlashes().LastIndexOf(Path.DirectorySeparatorChar) - (value.Length - value.BackSlashes().LastIndexOf('.')) - 1);
+            => Path.GetFileNameWithoutExtension(value);
 
         /// <summary>
         /// Creates a relative path from one file or folder to another.
