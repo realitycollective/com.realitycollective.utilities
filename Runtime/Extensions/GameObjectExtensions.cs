@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -235,6 +237,19 @@ namespace RealityCollective.Extensions
         {
             T component = gameObject.GetComponent<T>();
             return component.IsNull() ? gameObject.AddComponent<T>() : component;
+        }
+
+        /// <summary>
+        /// Validates the <see cref="GameObject"/> reference.
+        /// </summary>
+        /// <param name="gameobject">The target <see cref="GameObject"/>.</param>
+        /// <param name="callerName">The <see cref="CallerFilePathAttribute"/> fills in this information.</param>
+        public static void Validate(this GameObject gameobject, [CallerFilePath] string callerName = "", string fieldName = "")
+        {
+            if (gameobject.IsNull())
+            {
+                throw new MissingReferenceException($"{Path.GetFileNameWithoutExtension(callerName)} is missing a {typeof(GameObject).Name} reference for {fieldName}");
+            }
         }
     }
 }
