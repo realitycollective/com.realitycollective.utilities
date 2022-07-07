@@ -139,5 +139,21 @@ namespace RealityCollective.Extensions
                 list.Add(item);
             }
         }
+
+        /// <summary>
+        /// Validate if a dictionary contains an item and add it if not found
+        /// </summary>
+        /// <typeparam name="TKey">Data type used in the Dictionary Key</typeparam>
+        /// <typeparam name="TValue">Data type used in the Dictionary Value</typeparam>
+        /// <param name="dictionary">The instance of the Dictionary to validate</param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public static void EnsureDictionaryItem<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue value)
+        {
+            if(!dictionary.TryGetValue(key, out _))
+            {
+                dictionary.Add(key, value);
+            }
+        }
     }
 }
