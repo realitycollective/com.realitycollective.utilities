@@ -157,13 +157,12 @@ namespace RealityCollective.Extensions
             if(!dictionary.TryGetValue(key, out _))
             {
                 dictionary.Add(key, value);
+                return;
             }
-            else
+
+            if (update)
             {
-                if (update)
-                {
-                    dictionary[key] = value;
-                }
+                dictionary[key] = value;
             }
         }
     }
