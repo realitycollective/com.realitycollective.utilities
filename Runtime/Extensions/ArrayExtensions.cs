@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 
 namespace RealityCollective.Extensions
 {
@@ -83,7 +84,7 @@ namespace RealityCollective.Extensions
         /// <typeparam name="T">The type of data contained with the array</typeparam>
         /// <param name="array">The Array of items to search</param>
         /// <param name="item">The item to search for in the array</param>
-        /// <returns></returns>
+        /// <returns>True if the array contains the supplied item</returns>
         public static bool Contains<T>(this T[] array, T item) where T : IComparable<T>
         {
             if (array == null || array.Length == 0)
@@ -102,6 +103,25 @@ namespace RealityCollective.Extensions
             }
 
             return isFound;
+        }
+
+        /// <summary>
+        /// Validate if an array contains an <see cref="IComparable"/> Item
+        /// </summary>
+        /// <typeparam name="T">The type of data contained with the array</typeparam>
+        /// <param name="array">The Array of items to search</param>
+        /// <param name="item">The item to search for in the array</param>
+        /// <param name="returnArray">If a new item was added to the array, a new is generated and returned here</param>
+        /// <returns>True if a new item was added to the collection</returns>
+        public static bool EnsureArrayItem<T>(this T[] array, T item, out T[] returnArray) where T : IComparable<T>
+        {
+            if (!array.Contains(item))
+            {
+                returnArray = array.AddItem(item);
+                return true;
+            }
+            returnArray = null;
+            return false;
         }
     }
 }
