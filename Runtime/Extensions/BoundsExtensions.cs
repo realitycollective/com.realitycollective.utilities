@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using RealityCollective.Definitions.Utilities;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace RealityCollective.Extensions
 {
@@ -63,6 +64,28 @@ namespace RealityCollective.Extensions
         private static Vector3[] corners = null;
 
         private static readonly Vector3[] rectTransformCorners = new Vector3[4];
+
+        // Axis of the capsule’s lengthwise orientation in the object’s local space
+        private const int CAPSULE_X_AXIS = 0;
+        private const int CAPSULE_Y_AXIS = 1;
+        private const int CAPSULE_Z_AXIS = 2;
+
+        // Edges used to render the bounds.
+        private static readonly int[] boundsEdges = new int[]
+        {
+             LBF, LBB,
+             LBB, LTB,
+             LTB, LTF,
+             LTF, LBF,
+             LBF, RTB,
+             RTB, RTF,
+             RTF, RBF,
+             RBF, RBB,
+             RBB, RTB,
+             RTF, LBB,
+             RBF, LTB,
+             RBB, LTF
+        };
 
         #region Public Static Functions
 
@@ -151,6 +174,46 @@ namespace RealityCollective.Extensions
         }
 
         /// <summary>
+        /// Gets all the corner points of the bounds in world space by transforming input bounds using the given transform
+        /// </summary>
+        /// <param name="transform">Local to world transform</param>
+        /// <param name="positions">Output corner positions</param>
+        /// <param name="bounds">Input bounds, in local space</param>
+        /// <remarks>
+        /// <para>Use BoxColliderExtensions.{Left|Right}{Bottom|Top}{Front|Back} consts to index into the output
+        /// corners array.</para>
+        /// </remarks>
+        public static void GetCornerPositions(this Bounds bounds, Transform transform, ref Vector3[] positions)
+        {
+            // Calculate the local points to transform.
+            Vector3 center = bounds.center;
+            Vector3 extents = bounds.extents;
+            float leftEdge = center.x - extents.x;
+            float rightEdge = center.x + extents.x;
+            float bottomEdge = center.y - extents.y;
+            float topEdge = center.y + extents.y;
+            float frontEdge = center.z - extents.z;
+            float backEdge = center.z + extents.z;
+
+            // Allocate the array if needed.
+            const int numPoints = 8;
+            if (positions == null || positions.Length != numPoints)
+            {
+                positions = new Vector3[numPoints];
+            }
+
+            // Transform all the local points to world space.
+            positions[LBF] = transform.TransformPoint(leftEdge, bottomEdge, frontEdge);
+            positions[LBB] = transform.TransformPoint(leftEdge, bottomEdge, backEdge);
+            positions[LTF] = transform.TransformPoint(leftEdge, topEdge, frontEdge);
+            positions[LTB] = transform.TransformPoint(leftEdge, topEdge, backEdge);
+            positions[RBF] = transform.TransformPoint(rightEdge, bottomEdge, frontEdge);
+            positions[RBB] = transform.TransformPoint(rightEdge, bottomEdge, backEdge);
+            positions[RTF] = transform.TransformPoint(rightEdge, topEdge, frontEdge);
+            positions[RTB] = transform.TransformPoint(rightEdge, topEdge, backEdge);
+        }
+
+        /// <summary>
         /// Gets all the corner points of the bounds.
         /// </summary>
         /// <param name="bounds"></param>
@@ -173,6 +236,36 @@ namespace RealityCollective.Extensions
 
             const int numPoints = 8;
 
+            if (positions == null || positions.Length != numPoints)
+            {
+                positions = new Vector3[numPoints];
+            }
+
+            positions[LBF] = new Vector3(leftEdge, bottomEdge, frontEdge);
+            positions[LBB] = new Vector3(leftEdge, bottomEdge, backEdge);
+            positions[LTF] = new Vector3(leftEdge, topEdge, frontEdge);
+            positions[LTB] = new Vector3(leftEdge, topEdge, backEdge);
+            positions[RBF] = new Vector3(rightEdge, bottomEdge, frontEdge);
+            positions[RBB] = new Vector3(rightEdge, bottomEdge, backEdge);
+            positions[RTF] = new Vector3(rightEdge, topEdge, frontEdge);
+            positions[RTB] = new Vector3(rightEdge, topEdge, backEdge);
+        }
+
+        /// <summary>
+        /// Gets all the corner points from Renderer's Bounds
+        /// </summary>
+        public static void GetCornerPositionsFromRendererBounds(this Bounds bounds, ref Vector3[] positions)
+        {
+            Vector3 center = bounds.center;
+            Vector3 extents = bounds.extents;
+            float leftEdge = center.x - extents.x;
+            float rightEdge = center.x + extents.x;
+            float bottomEdge = center.y - extents.y;
+            float topEdge = center.y + extents.y;
+            float frontEdge = center.z - extents.z;
+            float backEdge = center.z + extents.z;
+
+            const int numPoints = 8;
             if (positions == null || positions.Length != numPoints)
             {
                 positions = new Vector3[numPoints];
@@ -331,6 +424,88 @@ namespace RealityCollective.Extensions
         }
 
         /// <summary>
+        /// Method to get bounds from a collection of points.
+        /// </summary>
+        /// <param name="points">The points to construct a bounds around.</param>
+        /// <param name="bounds">An AABB in world space around all the points.</param>
+        /// <returns>True if bounds were calculated, if zero points are present bounds will not be calculated.</returns>
+        public static bool GetPointsBounds(List<Vector3> points, out Bounds bounds)
+        {
+            if (points.Count != 0)
+            {
+                bounds = new Bounds(points[0], Vector3.zero);
+
+                for (var i = 1; i < points.Count; ++i)
+                {
+                    bounds.Encapsulate(points[i]);
+                }
+
+                return true;
+            }
+
+            bounds = new Bounds();
+            return false;
+        }
+
+        /// <summary>
+        /// Method to get bounds using collider method.
+        /// </summary>
+        /// <param name="target">GameObject to generate the bounds around.</param>
+        /// <param name="bounds">An AABB in world space around all the colliders in a gameObject hierarchy.</param>
+        /// <param name="ignoreLayers">A LayerMask to restrict the colliders selected.</param>
+        /// <returns>True if bounds were calculated, if zero colliders are present bounds will not be calculated.</returns>
+        public static bool GetColliderBounds(GameObject target, out Bounds bounds, LayerMask ignoreLayers)
+        {
+            var boundsPoints = new List<Vector3>();
+            GetColliderBoundsPoints(target, boundsPoints, ignoreLayers);
+
+            return GetPointsBounds(boundsPoints, out bounds);
+        }
+
+        /// <summary>
+        /// Calculates how much scale is required for this Bounds to match another Bounds.
+        /// </summary>
+        /// <param name="otherBounds">Object representation to be scaled to</param>
+        /// <param name="padding">padding multiplied into another bounds</param>
+        /// <returns>Scale represented as a Vector3 </returns>
+        public static Vector3 GetScaleToMatchBounds(this Bounds bounds, Bounds otherBounds, Vector3 padding = default(Vector3))
+        {
+            Vector3 szA = otherBounds.size + new Vector3(otherBounds.size.x * padding.x, otherBounds.size.y * padding.y, otherBounds.size.z * padding.z);
+            Vector3 szB = bounds.size;
+            Assert.IsTrue(szB.x != 0 && szB.y != 0 && szB.z != 0, "The bounds of the object must not be zero.");
+            return new Vector3(szA.x / szB.x, szA.y / szB.y, szA.z / szB.z);
+        }
+
+        /// <summary>
+        /// Calculates how much scale is required for this Bounds to fit inside another bounds without stretching.
+        /// </summary>
+        /// <param name="containerBounds">The bounds of the container we're trying to fit this object.</param>
+        /// <returns>A single scale factor that can be applied to this object to fit inside the container.</returns>
+        public static float GetScaleToFitInside(this Bounds bounds, Bounds containerBounds)
+        {
+            var objectSize = bounds.size;
+            var containerSize = containerBounds.size;
+            Assert.IsTrue(objectSize.x != 0 && objectSize.y != 0 && objectSize.z != 0, "The bounds of the container must not be zero.");
+            return Mathf.Min(containerSize.x / objectSize.x, containerSize.y / objectSize.y, containerSize.z / objectSize.z);
+        }
+
+        /// <summary>
+        /// Method to get bounding box points using Collider method.
+        /// </summary>
+        /// <param name="target">gameObject that boundingBox bounds.</param>
+        /// <param name="boundsPoints">array reference that gets filled with points</param>
+        /// <param name="ignoreLayers">layerMask to simplify search</param>
+        /// <param name="relativeTo">compute bounds relative to this transform</param>
+        public static void GetColliderBoundsPoints(GameObject target, List<Vector3> boundsPoints, LayerMask ignoreLayers, Transform relativeTo = null)
+        {
+            Collider[] colliders = target.GetComponentsInChildren<Collider>();
+            for (int i = 0; i < colliders.Length; i++)
+            {
+                GetColliderBoundsPoints(colliders[i], boundsPoints, ignoreLayers, relativeTo);
+            }
+        }
+
+        /// <summary>
         /// Method to get bounding box points using Collider method.
         /// </summary>
         /// <param name="target">gameObject that boundingBox bounds.</param>
@@ -394,6 +569,65 @@ namespace RealityCollective.Extensions
                         boundsPoints.AddRange(corners);
                         break;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Method to get bounds from a single Collider
+        /// </summary>
+        /// <param name="collider">Target collider</param>
+        /// <param name="boundsPoints">array reference that gets filled with points</param>
+        /// <param name="ignoreLayers">layerMask to simplify search</param>
+        public static void GetColliderBoundsPoints(Collider collider, List<Vector3> boundsPoints, LayerMask ignoreLayers, Transform relativeTo = null)
+        {
+            if (ignoreLayers == (1 << collider.gameObject.layer | ignoreLayers)) { return; }
+
+            if (collider is SphereCollider)
+            {
+                SphereCollider sc = collider as SphereCollider;
+                Bounds sphereBounds = new Bounds(sc.center, 2 * sc.radius * Vector3.one);
+                sphereBounds.GetFacePositions(sc.transform, ref corners);
+                InverseTransformPoints(ref corners, relativeTo);
+                boundsPoints.AddRange(corners);
+            }
+            else if (collider is BoxCollider)
+            {
+                BoxCollider bc = collider as BoxCollider;
+                Bounds boxBounds = new Bounds(bc.center, bc.size);
+                boxBounds.GetCornerPositions(bc.transform, ref corners);
+                InverseTransformPoints(ref corners, relativeTo);
+                boundsPoints.AddRange(corners);
+
+            }
+            else if (collider is MeshCollider)
+            {
+                MeshCollider mc = collider as MeshCollider;
+                Bounds meshBounds = mc.sharedMesh.bounds;
+                meshBounds.GetCornerPositions(mc.transform, ref corners);
+                InverseTransformPoints(ref corners, relativeTo);
+                boundsPoints.AddRange(corners);
+            }
+            else if (collider is CapsuleCollider)
+            {
+                CapsuleCollider cc = collider as CapsuleCollider;
+                Bounds capsuleBounds = new Bounds(cc.center, Vector3.zero);
+                switch (cc.direction)
+                {
+                    case CAPSULE_X_AXIS:
+                        capsuleBounds.size = new Vector3(cc.height, cc.radius * 2, cc.radius * 2);
+                        break;
+
+                    case CAPSULE_Y_AXIS:
+                        capsuleBounds.size = new Vector3(cc.radius * 2, cc.height, cc.radius * 2);
+                        break;
+
+                    case CAPSULE_Z_AXIS:
+                        capsuleBounds.size = new Vector3(cc.radius * 2, cc.radius * 2, cc.height);
+                        break;
+                }
+                capsuleBounds.GetFacePositions(cc.transform, ref corners);
+                InverseTransformPoints(ref corners, relativeTo);
+                boundsPoints.AddRange(corners);
             }
         }
 
@@ -622,6 +856,140 @@ namespace RealityCollective.Extensions
             return (distToClosestPoint1.magnitude <= distToClosestPoint2.magnitude);
         }
 
+        /// <summary>
+        /// Draws a wire frame <see href="https://docs.unity3d.com/ScriptReference/Bounds.html">Bounds</see> object using <see href="https://docs.unity3d.com/ScriptReference/Debug.DrawLine.html">Debug.DrawLine</see>.
+        /// </summary>
+        /// <param name="bounds">The <see href="https://docs.unity3d.com/ScriptReference/Bounds.html">Bounds</see> to draw.</param>
+        /// <param name="color">Color of the line.</param>
+        /// <param name="duration">How long the line should be visible for in seconds.</param>
+        /// <param name="depthTest">Should the line be obscured by objects closer to the camera?</param>
+        public static void DebugDraw(this Bounds bounds, Color color, float duration = 0.0f, bool depthTest = true)
+        {
+            var center = bounds.center;
+            var x = bounds.extents.x;
+            var y = bounds.extents.y;
+            var z = bounds.extents.z;
+            var a = new Vector3(-x, y, -z);
+            var b = new Vector3(x, -y, -z);
+            var c = new Vector3(x, y, -z);
+
+            var vertices = new Vector3[]
+            {
+                bounds.min, center + a, center + b, center + c,
+                bounds.max, center - a, center - b, center - c
+            };
+
+            for (var i = 0; i < boundsEdges.Length; i += 2)
+            {
+                Debug.DrawLine(vertices[boundsEdges[i]], vertices[boundsEdges[i + 1]], color, duration, depthTest);
+            }
+        }
+
+        /// <summary>
+        /// Calculate the intersection area between the rectangle and another.
+        /// </summary>
+        // https://forum.unity.com/threads/getting-the-area-rect-of-intersection-between-two-rectangles.299140/
+        public static bool Intersects(this Rect thisRect, Rect rect, out Rect area)
+        {
+            area = new Rect();
+
+            if (rect.Overlaps(thisRect))
+            {
+                float x1 = Mathf.Min(thisRect.xMax, rect.xMax);
+                float x2 = Mathf.Max(thisRect.xMin, rect.xMin);
+                float y1 = Mathf.Min(thisRect.yMax, rect.yMax);
+                float y2 = Mathf.Max(thisRect.yMin, rect.yMin);
+                area.x = Mathf.Min(x1, x2);
+                area.y = Mathf.Min(y1, y2);
+                area.width = Mathf.Max(0.0f, x1 - x2);
+                area.height = Mathf.Max(0.0f, y1 - y2);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Compute Bounds, localized to <paramref name="root"/>, of all children of <paramref name="root"/>, excluding <paramref name="exclude"/>.
+        /// </summary>
+        /// <remarks>
+        /// This is quite expensive, so call sparingly! This traverses the entire hierarchy and does quite a lot of work on each node.
+        /// </remarks>
+        /// <param name="root">The root transform under which this method will traverse + calculate composite bounds.</param>
+        /// <param name="exclude">The transform to exclude from the bounds calculation. Only valid if a direct child of <paramref name="root"/>.</param>
+        /// <param name="boundsCalculationMethod">Method to use to calculate bounds.</param>
+        /// <param name="containsCanvas">
+        /// Set to true if the bounds calculation finds a RectTransform. If true, it is recommended to re-run
+        /// this bounds calculation once more after a single frame delay, to make sure the computed layout sizing is taken into account.
+        /// </param>
+        /// <param name="includeInactiveObjects">Should objects that are currently inactive be included in the bounds calculation?</param>
+        /// <param name="abortOnCanvas">Should we early-out if we find a canvas element? Will still set <paramref name="containsCanvas"/> = true.</param>
+        public static Bounds CalculateBounds(Transform root, Transform target, Transform exclude, out bool containsCanvas,
+                                               BoundsCalculationMethod boundsCalculationMethod = BoundsCalculationMethod.RendererOverCollider,
+                                               bool includeInactiveObjects = false,
+                                               bool abortOnCanvas = false)
+        {
+            totalBoundsCorners.Clear();
+            childTransforms.Clear();
+            containsCanvas = false;
+
+            // Iterate transforms and collect bound volumes
+            foreach (Transform childTransform in target.GetComponentsInChildren<Transform>(includeInactiveObjects))
+            {
+                // Reject if child of exclude 
+                if (exclude != null)
+                {
+                    if (childTransform.IsChildOf(exclude)) { continue; }
+                }
+
+
+                containsCanvas |= childTransform is RectTransform;
+                if (containsCanvas && abortOnCanvas) { break; }
+
+                ExtractBoundsCorners(childTransform, boundsCalculationMethod);
+            }
+
+            if (totalBoundsCorners.Count == 0)
+            {
+                return new Bounds();
+            }
+
+            Bounds finalBounds = new Bounds(root.InverseTransformPoint(totalBoundsCorners[0]), Vector3.zero);
+
+            for (int i = 1; i < totalBoundsCorners.Count; i++)
+            {
+                finalBounds.Encapsulate(root.InverseTransformPoint(totalBoundsCorners[i]));
+            }
+
+            return finalBounds;
+        }
+
+        /// <summary>
+        /// Compute the flattening vector for a bounds of size <paramref name="size"/>.
+        /// <returns>
+        /// Returns a unit vector along the direction of the smallest component of <paramref name="size"/>.
+        /// </returns>
+        /// <remarks>
+        /// Returns Vector3.forward if all components are approximately equal.
+        /// </remarks>
+        /// <param name="size">The size of the bounds to compute the flatten vector for.</param>
+        public static Vector3 CalculateFlattenVector(Vector3 size)
+        {
+            if (size.x < size.y && size.x < size.z)
+            {
+                return Vector3.right;
+            }
+            else if (size.y < size.x && size.y < size.z)
+            {
+                return Vector3.up;
+            }
+            else
+            {
+                return Vector3.forward;
+            }
+        }
+
         #endregion
 
         #region Private Static Functions
@@ -634,6 +1002,125 @@ namespace RealityCollective.Extensions
             return new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
         }
 
+
+        /// <summary>
+        /// This enum defines what volume type the bound calculation depends on and its priority.
+        /// </summary>
+        public enum BoundsCalculationMethod
+        {
+            /// <summary>
+            /// Used Renderers for the bounds calculation and Colliders as a fallback
+            /// </summary>
+            RendererOverCollider = 0,
+
+            /// <summary>
+            /// Used Colliders for the bounds calculation and Renderers as a fallback
+            /// </summary>
+            ColliderOverRenderer,
+
+            /// <summary>
+            /// Omits Renderers and uses Colliders for the bounds calculation exclusively
+            /// </summary>
+            ColliderOnly,
+
+            /// <summary>
+            /// Omits Colliders and uses Renderers for the bounds calculation exclusively
+            /// </summary>
+            RendererOnly,
+        }
+
+        // Private scratchpad to reduce allocs.
+        private static List<Vector3> totalBoundsCorners = new List<Vector3>(8);
+
+        // Private scratchpad to reduce allocs.
+        private static List<Transform> childTransforms = new List<Transform>();
+
+        // Private scratchpad to reduce allocs.
+        private static Vector3[] cornersToWorld = new Vector3[8];
+
+        private static void ExtractBoundsCorners(Transform childTransform, BoundsCalculationMethod boundsCalculationMethod)
+        {
+            KeyValuePair<Transform, Collider> colliderByTransform = default;
+            KeyValuePair<Transform, Bounds> rendererBoundsByTransform = default;
+
+            if (boundsCalculationMethod != BoundsCalculationMethod.RendererOnly)
+            {
+                Collider collider = childTransform.GetComponent<Collider>();
+                if (collider != null)
+                {
+                    colliderByTransform = new KeyValuePair<Transform, Collider>(childTransform, collider);
+                }
+                else
+                {
+                    colliderByTransform = new KeyValuePair<Transform, Collider>();
+                }
+            }
+
+            if (boundsCalculationMethod != BoundsCalculationMethod.ColliderOnly)
+            {
+                MeshFilter meshFilter = childTransform.GetComponent<MeshFilter>();
+                if (meshFilter != null && meshFilter.sharedMesh != null)
+                {
+                    rendererBoundsByTransform = new KeyValuePair<Transform, Bounds>(childTransform, meshFilter.sharedMesh.bounds);
+                }
+                else if (childTransform is RectTransform rt)
+                {
+                    rendererBoundsByTransform = new KeyValuePair<Transform, Bounds>(childTransform, new Bounds(rt.rect.center, new Vector3(rt.rect.width, rt.rect.height, 0.1f)));
+                }
+                else
+                {
+                    rendererBoundsByTransform = new KeyValuePair<Transform, Bounds>();
+                }
+            }
+
+            // Encapsulate the collider bounds if criteria match
+            if (boundsCalculationMethod == BoundsCalculationMethod.ColliderOnly ||
+                boundsCalculationMethod == BoundsCalculationMethod.ColliderOverRenderer)
+            {
+                if (AddColliderBoundsCornersToTarget(colliderByTransform) && boundsCalculationMethod == BoundsCalculationMethod.ColliderOverRenderer ||
+                    boundsCalculationMethod == BoundsCalculationMethod.ColliderOnly) { return; }
+            }
+
+            // Encapsulate the renderer bounds if criteria match
+            if (boundsCalculationMethod != BoundsCalculationMethod.ColliderOnly)
+            {
+                if (AddRendererBoundsCornersToTarget(rendererBoundsByTransform) && boundsCalculationMethod == BoundsCalculationMethod.RendererOverCollider ||
+                    boundsCalculationMethod == BoundsCalculationMethod.RendererOnly) { return; }
+            }
+
+            // Do the collider for the one case that we chose RendererOverCollider and did not find a renderer
+            AddColliderBoundsCornersToTarget(colliderByTransform);
+        }
+
+        private static bool AddRendererBoundsCornersToTarget(KeyValuePair<Transform, Bounds> rendererBoundsByTarget)
+        {
+            if (rendererBoundsByTarget.Key == null) { return false; }
+
+            rendererBoundsByTarget.Value.GetCornerPositions(rendererBoundsByTarget.Key, ref cornersToWorld);
+            totalBoundsCorners.AddRange(cornersToWorld);
+            return true;
+        }
+
+        private static bool AddColliderBoundsCornersToTarget(KeyValuePair<Transform, Collider> colliderByTransform)
+        {
+            if (colliderByTransform.Key != null)
+            {
+                BoundsExtensions.GetColliderBoundsPoints(colliderByTransform.Value, totalBoundsCorners, 0);
+            }
+
+            return colliderByTransform.Key != null;
+        }
+
+        private static void InverseTransformPoints(ref Vector3[] positions, Transform relativeTo)
+        {
+            if (relativeTo)
+            {
+                for (var i = 0; i < positions.Length; ++i)
+                {
+                    positions[i] = relativeTo.InverseTransformPoint(positions[i]);
+                }
+            }
+        }
         #endregion
     }
 }
