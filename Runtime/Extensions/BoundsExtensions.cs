@@ -935,19 +935,19 @@ namespace RealityCollective.Extensions
             containsCanvas = false;
 
             // Iterate transforms and collect bound volumes
-            foreach (Transform childTransform in target.GetComponentsInChildren<Transform>(includeInactiveObjects))
+            foreach (Renderer childTransform in target.GetComponentsInChildren<Renderer>(includeInactiveObjects))
             {
                 // Reject if child of exclude 
                 if (exclude != null)
                 {
-                    if (childTransform.IsChildOf(exclude)) { continue; }
+                    if (childTransform.transform.IsChildOf(exclude)) { continue; }
                 }
 
 
                 containsCanvas |= childTransform is RectTransform;
                 if (containsCanvas && abortOnCanvas) { break; }
 
-                ExtractBoundsCorners(childTransform, boundsCalculationMethod);
+                ExtractBoundsCorners(childTransform.transform, boundsCalculationMethod);
             }
 
             if (totalBoundsCorners.Count == 0)
