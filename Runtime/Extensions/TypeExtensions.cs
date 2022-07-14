@@ -104,6 +104,11 @@ namespace RealityCollective.Extensions
             if (guid == Guid.Empty ||
                 !TypeCache.Current.TryGetValue(guid, out resolvedType))
             {
+                //Serious enough to put severe logging here as it will cause you many hours of hair pulling, only to find it is because Unity removed the class to be helpful with its Code Stripping functionality.
+                //Add a Link.XML to the project and sleep better.
+                var message = $"Configured Type Guid [{guid}] not found, either missing or lost to the curring room floor of Unity Code Stripping.\n If the class is in the project, consider including it in a Link.xml";
+                Debug.LogError(message);
+                System.Diagnostics.Debug.WriteLine(message);
                 return false;
             }
 

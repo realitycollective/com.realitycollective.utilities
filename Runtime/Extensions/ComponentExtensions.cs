@@ -72,13 +72,16 @@ namespace RealityCollective.Extensions
         /// exists on the game object.
         /// </summary>
         /// <param name="gameObject">The <see cref="GameObject"/> to remove the component from.</param>
-        public static void EnsureComponentDestroyed<T>(this GameObject gameObject) where T : Component
+        /// <returns>True if a new item was added to the collection</returns>
+        public static bool EnsureComponentDestroyed<T>(this GameObject gameObject) where T : Component
         {
             T foundComponent = gameObject.GetComponent<T>();
             if (foundComponent.IsNotNull())
             {
                 foundComponent.Destroy();
+                return true;
             }
+            return false;
         }
 
         /// Validates the <see cref="Component"/> reference.
@@ -100,13 +103,16 @@ namespace RealityCollective.Extensions
         /// </summary>
         /// <param name="gameObject">The <see cref="GameObject"/> to remove the component from.</param>
         /// <param name="component">A component on the game object for which a component of type should be removed.</param>
-        public static void EnsureComponentDestroyed(this GameObject gameObject, Type component)
+        /// <returns>True if a new item was added to the collection</returns>
+        public static bool EnsureComponentDestroyed(this GameObject gameObject, Type component)
         {
             var foundComponent = gameObject.GetComponent(component);
             if (foundComponent.IsNotNull())
             {
                 foundComponent.Destroy();
+                return true;
             }
+            return false;
         }
 
         /// Sets the <see cref="GameObject"/> this <see cref="Component"/> is attached to, to the specified state.
