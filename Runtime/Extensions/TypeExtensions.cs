@@ -101,8 +101,12 @@ namespace RealityCollective.Extensions
         {
             resolvedType = null;
 
-            if (guid == Guid.Empty ||
-                !TypeCache.Current.TryGetValue(guid, out resolvedType))
+            if (guid == Guid.Empty)
+            {
+                return false;
+            }
+
+            if (!TypeCache.Current.TryGetValue(guid, out resolvedType))
             {
                 //Serious enough to put severe logging here as it will cause you many hours of hair pulling, only to find it is because Unity removed the class to be helpful with its Code Stripping functionality.
                 //Add a Link.XML to the project and sleep better.
