@@ -153,7 +153,7 @@ namespace RealityCollective.Extensions
         /// <returns>True if the item was removed from the collection</returns>
         public static void SafeRemoveListItem<T>(this IList<T> list, T item)
         {
-            if (list != null && list.Contains(item))
+            if (list != null && item != null && list.Contains(item))
             {
                 list.Remove(item);
             }
@@ -168,7 +168,7 @@ namespace RealityCollective.Extensions
         /// <returns>True if the item was removed from the collection</returns>
         public static bool TrySafeRemoveListItem<T>(this IList<T> list, T item)
         {
-            if (list != null && list.Contains(item))
+            if (list != null && item != null && list.Contains(item))
             {
                 list.SafeRemoveListItem(item);
                 return true;
