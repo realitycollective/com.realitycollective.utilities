@@ -145,31 +145,21 @@ namespace RealityCollective.Extensions
         }
 
         /// <summary>
-        /// Validate if a list contains items from another collection and adds items if not found, essentially merging the lists.
+        /// Safely removes an item from a <see cref="List{T}"/> if it is found.
         /// </summary>
         /// <typeparam name="T">Data type used in the List.</typeparam>
         /// <param name="list">The instance of the List to validate.</param>
-        /// <param name="items">The array of items of Type T to add to the list if not found</param>
-        public static void EnsureListItems<T>(this IList<T> list, T[] items)
+        /// <param name="item">The item of Type T to remove to the list if not found</param>
+        /// <returns>True if the item was removed from the collection</returns>
+        public static bool SafeRemoveListItem<T>(this IList<T> list, T item)
         {
-            foreach (var item in items)
+            if (list.Contains(item))
             {
-                list.EnsureListItem(item);
+                list.Remove(item);
+                return true;
             }
-        }
 
-        /// <summary>
-        /// Validate if a list contains items from another collection and adds items if not found, essentially merging the lists.
-        /// </summary>
-        /// <typeparam name="T">Data type used in the List.</typeparam>
-        /// <param name="list">The instance of the List to validate.</param>
-        /// <param name="items">The List of items of Type T to add to the list if not found</param>
-        public static void EnsureListItems<T>(this IList<T> list, IList<T> items)
-        {
-            foreach (var item in items)
-            {
-                list.EnsureListItem(item);
-            }
+            return false;
         }
 
         /// <summary>
@@ -197,6 +187,25 @@ namespace RealityCollective.Extensions
             {
                 dictionary[key] = value;
             }
+            return false;
+        }
+
+        /// <summary>
+        /// Safely removes an item from a <see cref="Dictionary{TKey, TValue}"/> if it is found.
+        /// </summary>
+        /// <typeparam name="TKey">Data type used in the Dictionary Key.</typeparam>
+        /// <typeparam name="TValue">Data type used in the Dictionary Value.</typeparam>
+        /// <param name="dictionary">The instance of the <see cref="Dictionary{TKey, TValue}"/> to validate.</param>
+        /// <param name="key">The Key of a <see cref="KeyValuePair{TKey, TValue}"/> to validate against the dictionary with.</param>
+        /// <returns>True if an item was removed from the collection</returns>
+        public static bool SafeRemoveDictionaryItem<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key)
+        {
+            if (dictionary.TryGetValue(key, out _))
+            {
+                dictionary.Remove(key);
+                return true;
+            }
+
             return false;
         }
     }
