@@ -192,7 +192,7 @@ namespace RealityCollective.Extensions
         /// <returns>True if a new item was added to the collection</returns>
         public static bool EnsureDictionaryItem<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue value, bool update = true)
         {
-            if(!dictionary.TryGetValue(key, out _))
+            if (!dictionary.TryGetValue(key, out _))
             {
                 dictionary.Add(key, value);
                 return true;
@@ -214,7 +214,7 @@ namespace RealityCollective.Extensions
         /// <param name="key">The Key of a <see cref="KeyValuePair{TKey, TValue}"/> to validate against the dictionary with.</param>
         public static void SafeRemoveDictionaryItem<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key)
         {
-            if (dictionary != null && dictionary.TryGetValue(key, out _))
+            if (dictionary != null && key != null && dictionary.TryGetValue(key, out _))
             {
                 dictionary.Remove(key);
             }
@@ -230,7 +230,7 @@ namespace RealityCollective.Extensions
         /// <returns>True if an item was removed from the collection</returns>
         public static bool TrySafeRemoveDictionaryItem<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key)
         {
-            if (dictionary != null && dictionary.TryGetValue(key, out _))
+            if (dictionary != null && key != null && dictionary.TryGetValue(key, out _))
             {
                 dictionary.SafeRemoveDictionaryItem(key);
                 return true;
