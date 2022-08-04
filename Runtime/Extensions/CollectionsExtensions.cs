@@ -143,6 +143,34 @@ namespace RealityCollective.Extensions
 
             return false;
         }
+        
+        /// <summary>
+        /// Validate if a list contains items from another collection and adds items if not found, essentially merging the lists.
+        /// </summary>
+        /// <typeparam name="T">Data type used in the List.</typeparam>
+        /// <param name="list">The instance of the List to validate.</param>
+        /// <param name="items">The array of items of Type T to add to the list if not found</param>
+        public static void EnsureListItems<T>(this IList<T> list, T[] items)
+        {
+            foreach (var item in items)
+            {
+                list.EnsureListItem(item);
+            }
+        }
+
+        /// <summary>
+        /// Validate if a list contains items from another collection and adds items if not found, essentially merging the lists.
+        /// </summary>
+        /// <typeparam name="T">Data type used in the List.</typeparam>
+        /// <param name="list">The instance of the List to validate.</param>
+        /// <param name="items">The List of items of Type T to add to the list if not found</param>
+        public static void EnsureListItems<T>(this IList<T> list, IList<T> items)
+        {
+            foreach (var item in items)
+            {
+                list.EnsureListItem(item);
+            }
+        }        
 
         /// <summary>
         /// Safely removes an item from a <see cref="List{T}"/> if it is found.
