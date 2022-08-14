@@ -784,7 +784,7 @@ namespace RealityCollective.Utilities.WebRequestRest
                 case DownloadHandlerAssetBundle _:
                     return new Response(true, null, null, webRequest.responseCode);
                 case DownloadHandlerBuffer _:
-                    return new Response(true, null, webRequest.downloadHandler?.data, webRequest.responseCode);
+                    return new Response(true, webRequest.downloadHandler?.text, webRequest.downloadHandler?.data, webRequest.responseCode);
                 default:
                     return new Response(true, webRequest.downloadHandler?.text, webRequest.downloadHandler?.data, webRequest.responseCode);
             }
