@@ -82,14 +82,15 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// <returns>The response data.</returns>
         public static async Task<Response> GetAsync(
             string query,
-            Dictionary<string, string> headers = null,
-            IProgress<float> progress =null,
-            int timeout = -1,
             DownloadHandler downloadHandler = null,
             bool readResponseData = false,
             CertificateHandler certificateHandler = null,
             bool disposeCertificateHandlerOnDispose = true,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default(CancellationToken),
+            Dictionary<string, string> headers = null,
+            IProgress<float> progress = null,
+            int timeout = -1
+            )
         {
             using (var webRequest = UnityWebRequest.Get(query))
             {
@@ -197,13 +198,14 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// <returns>The response data.</returns>
         public static async Task<Response> PostAsync(
             string query,
-            Dictionary<string, string> headers = null,
-            IProgress<float> progress = null,
-            int timeout = -1,
             bool readResponseData = false,
             CertificateHandler certificateHandler = null,
             bool disposeCertificateHandlerOnDispose = true,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default(CancellationToken),
+            Dictionary<string, string> headers = null,
+            IProgress<float> progress = null,
+            int timeout = -1
+)
         {
             using (var webRequest = UnityWebRequest.Post(query, null as string))
             {
@@ -229,13 +231,14 @@ namespace RealityCollective.Utilities.WebRequestRest
         public static async Task<Response> PostAsync(
             string query,
             WWWForm formData,
-            Dictionary<string, string> headers = null,
-            IProgress<float> progress = null,
-            int timeout = -1, 
             bool readResponseData = false,
             CertificateHandler certificateHandler = null,
             bool disposeCertificateHandlerOnDispose = true,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default(CancellationToken),
+            Dictionary<string, string> headers = null,
+            IProgress<float> progress = null,
+            int timeout = -1
+            )
         {
             using (var webRequest = UnityWebRequest.Post(query, formData))
             {
@@ -301,13 +304,14 @@ namespace RealityCollective.Utilities.WebRequestRest
         public static async Task<Response> PutAsync(
             string query,
             byte[] bodyData,
-            Dictionary<string, string> headers = null,
-            IProgress<float> progress = null,
-            int timeout = -1,
             bool readResponseData = false,
             CertificateHandler certificateHandler = null,
             bool disposeCertificateHandlerOnDispose = true,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default(CancellationToken),
+            Dictionary<string, string> headers = null,
+            IProgress<float> progress = null,
+            int timeout = -1
+            )
         {
             using (var webRequest = UnityWebRequest.Put(query, bodyData))
             {
@@ -352,13 +356,14 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// <returns>The response data.</returns>
         public static async Task<Response> DeleteAsync(
             string query,
-            Dictionary<string, string> headers = null,
-            IProgress<float> progress = null,
-            int timeout = -1,
             bool readResponseData = false,
             CertificateHandler certificateHandler = null,
             bool disposeCertificateHandlerOnDispose = true,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default(CancellationToken),
+            Dictionary<string, string> headers = null,
+            IProgress<float> progress = null,
+            int timeout = -1
+            )
         {
             using (var webRequest = UnityWebRequest.Delete(query))
             {
@@ -676,6 +681,7 @@ namespace RealityCollective.Utilities.WebRequestRest
 
         #endregion Get Multimedia Content
 
+        #region Private Functions
         private static async Task<Response> ProcessRequestAsync(UnityWebRequest webRequest, Dictionary<string, string> headers, IProgress<float> progress, int timeout, bool readResponseData = false, CertificateHandler certificateHandler = null, bool disposeCertificateHandlerOnDispose = true)
         {
             await Awaiters.UnityMainThread;
@@ -789,5 +795,6 @@ namespace RealityCollective.Utilities.WebRequestRest
                     return new Response(true, webRequest.downloadHandler?.text, webRequest.downloadHandler?.data, webRequest.responseCode);
             }
         }
+        #endregion Private Functions
     }
 }
