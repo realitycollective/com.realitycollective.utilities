@@ -68,6 +68,43 @@ namespace RealityCollective.Utilities.WebRequestRest
                 return await ProcessRequestAsync(webRequest, headers, progress, timeout);
             }
         }
+        
+        /// <summary>
+        /// Rest GET.
+        /// </summary>
+        /// <param name="query">Finalized Endpoint Query with parameters.</param>
+        /// <param name="headers">Optional header information for the request.</param>
+        /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="downloadHandler">Optional DownloadHandler for the request.</param>
+        /// <param name="readResponseData">Optional bool. If its true, response data will be read from web request download handler.</param>
+        /// <param name="certificateHandler">Optional certificate handler for custom certificate verification</param>
+        /// <param name="disposeCertificateHandlerOnDispose">Optional bool. If true and <paramref name="certificateHandler"/> is not null, <paramref name="certificateHandler"/> will be disposed, when the underlying UnityWebRequest is disposed.</param>
+        /// <returns>The response data.</returns>
+        public static async Task<Response> GetAsync(
+            string query,
+            Dictionary<string, string> headers = null,
+            IProgress<float> progress =null,
+            int timeout = -1,
+            DownloadHandler downloadHandler = null,
+            bool readResponseData = false,
+            CertificateHandler certificateHandler = null,
+            bool disposeCertificateHandlerOnDispose = true,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            using (var webRequest = UnityWebRequest.Get(query))
+            {
+                if (downloadHandler != null)
+                {
+                    webRequest.downloadHandler = downloadHandler;
+                }
+                cancellationToken.Register(() =>
+                {
+                    webRequest.Abort();
+                });
+
+                return await ProcessRequestAsync(webRequest, headers, progress, timeout, readResponseData, certificateHandler, disposeCertificateHandlerOnDispose);
+            }
+        }
 
         #endregion GET
 
@@ -147,6 +184,68 @@ namespace RealityCollective.Utilities.WebRequestRest
                 return await ProcessRequestAsync(webRequest, headers, progress, timeout);
             }
         }
+        
+        /// <summary>
+        /// Rest POST.
+        /// </summary>
+        /// <param name="query">Finalized Endpoint Query with parameters.</param>
+        /// <param name="headers">Optional header information for the request.</param>
+        /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="readResponseData">Optional bool. If its true, response data will be read from web request download handler.</param>
+        /// <param name="certificateHandler">Optional certificate handler for custom certificate verification</param>
+        /// <param name="disposeCertificateHandlerOnDispose">Optional bool. If true and <paramref name="certificateHandler"/> is not null, <paramref name="certificateHandler"/> will be disposed, when the underlying UnityWebRequest is disposed.</param>
+        /// <returns>The response data.</returns>
+        public static async Task<Response> PostAsync(
+            string query,
+            Dictionary<string, string> headers = null,
+            IProgress<float> progress = null,
+            int timeout = -1,
+            bool readResponseData = false,
+            CertificateHandler certificateHandler = null,
+            bool disposeCertificateHandlerOnDispose = true,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            using (var webRequest = UnityWebRequest.Post(query, null as string))
+            {
+                cancellationToken.Register(() =>
+                {
+                    webRequest.Abort();
+                });
+                return await ProcessRequestAsync(webRequest, headers, progress, timeout, readResponseData, certificateHandler, disposeCertificateHandlerOnDispose);
+            }
+        }
+        
+        /// <summary>
+        /// Rest POST.
+        /// </summary>
+        /// <param name="query">Finalized Endpoint Query with parameters.</param>
+        /// <param name="formData">Form Data.</param>
+        /// <param name="headers">Optional header information for the request.</param>
+        /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="readResponseData">Optional bool. If its true, response data will be read from web request download handler.</param>
+        /// <param name="certificateHandler">Optional certificate handler for custom certificate verification</param>
+        /// <param name="disposeCertificateHandlerOnDispose">Optional bool. If true and <paramref name="certificateHandler"/> is not null, <paramref name="certificateHandler"/> will be disposed, when the underlying UnityWebRequest is disposed.</param>
+        /// <returns>The response data.</returns>
+        public static async Task<Response> PostAsync(
+            string query,
+            WWWForm formData,
+            Dictionary<string, string> headers = null,
+            IProgress<float> progress = null,
+            int timeout = -1, 
+            bool readResponseData = false,
+            CertificateHandler certificateHandler = null,
+            bool disposeCertificateHandlerOnDispose = true,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            using (var webRequest = UnityWebRequest.Post(query, formData))
+            {
+                cancellationToken.Register(() =>
+                {
+                    webRequest.Abort();
+                });
+                return await ProcessRequestAsync(webRequest, headers, progress, timeout, readResponseData, certificateHandler, disposeCertificateHandlerOnDispose);
+            }
+        }
 
         #endregion POST
 
@@ -187,6 +286,39 @@ namespace RealityCollective.Utilities.WebRequestRest
                 return await ProcessRequestAsync(webRequest, headers, progress, timeout);
             }
         }
+        
+        /// <summary>
+        /// Rest PUT.
+        /// </summary>
+        /// <param name="query">Finalized Endpoint Query with parameters.</param>
+        /// <param name="bodyData">Data to be submitted.</param>
+        /// <param name="headers">Optional header information for the request.</param>
+        /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="readResponseData">Optional bool. If its true, response data will be read from web request download handler.</param>
+        /// <param name="certificateHandler">Optional certificate handler for custom certificate verification</param>
+        /// <param name="disposeCertificateHandlerOnDispose">Optional bool. If true and <paramref name="certificateHandler"/> is not null, <paramref name="certificateHandler"/> will be disposed, when the underlying UnityWebRequest is disposed.</param>
+        /// <returns>The response data.</returns>
+        public static async Task<Response> PutAsync(
+            string query,
+            byte[] bodyData,
+            Dictionary<string, string> headers = null,
+            IProgress<float> progress = null,
+            int timeout = -1,
+            bool readResponseData = false,
+            CertificateHandler certificateHandler = null,
+            bool disposeCertificateHandlerOnDispose = true,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            using (var webRequest = UnityWebRequest.Put(query, bodyData))
+            {
+                cancellationToken.Register(() =>
+                {
+                    webRequest.Abort();
+                });
+                webRequest.SetRequestHeader("Content-Type", "application/octet-stream");
+                return await ProcessRequestAsync(webRequest, headers, progress, timeout, readResponseData, certificateHandler, disposeCertificateHandlerOnDispose);
+            }
+        }
 
         #endregion PUT
 
@@ -205,6 +337,36 @@ namespace RealityCollective.Utilities.WebRequestRest
             using (var webRequest = UnityWebRequest.Delete(query))
             {
                 return await ProcessRequestAsync(webRequest, headers, progress, timeout);
+            }
+        }
+        
+        /// <summary>
+        /// Rest DELETE.
+        /// </summary>
+        /// <param name="query">Finalized Endpoint Query with parameters.</param>
+        /// <param name="headers">Optional header information for the request.</param>
+        /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="readResponseData">Optional bool. If its true, response data will be read from web request download handler.</param>
+        /// <param name="certificateHandler">Optional certificate handler for custom certificate verification</param>
+        /// <param name="disposeCertificateHandlerOnDispose">Optional bool. If true and <paramref name="certificateHandler"/> is not null, <paramref name="certificateHandler"/> will be disposed, when the underlying UnityWebRequest is disposed.</param>
+        /// <returns>The response data.</returns>
+        public static async Task<Response> DeleteAsync(
+            string query,
+            Dictionary<string, string> headers = null,
+            IProgress<float> progress = null,
+            int timeout = -1,
+            bool readResponseData = false,
+            CertificateHandler certificateHandler = null,
+            bool disposeCertificateHandlerOnDispose = true,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            using (var webRequest = UnityWebRequest.Delete(query))
+            {
+                cancellationToken.Register(() =>
+                {
+                    webRequest.Abort();
+                });
+                return await ProcessRequestAsync(webRequest, headers, progress, timeout,readResponseData, certificateHandler, disposeCertificateHandlerOnDispose);
             }
         }
 
@@ -514,7 +676,7 @@ namespace RealityCollective.Utilities.WebRequestRest
 
         #endregion Get Multimedia Content
 
-        private static async Task<Response> ProcessRequestAsync(UnityWebRequest webRequest, Dictionary<string, string> headers, IProgress<float> progress, int timeout)
+        private static async Task<Response> ProcessRequestAsync(UnityWebRequest webRequest, Dictionary<string, string> headers, IProgress<float> progress, int timeout, bool readResponseData = false, CertificateHandler certificateHandler = null, bool disposeCertificateHandlerOnDispose = true)
         {
             await Awaiters.UnityMainThread;
 
@@ -576,6 +738,8 @@ namespace RealityCollective.Utilities.WebRequestRest
 
             try
             {
+                webRequest.certificateHandler = certificateHandler;
+                webRequest.disposeCertificateHandlerOnDispose = disposeCertificateHandlerOnDispose;
                 await webRequest.SendWebRequest();
             }
             catch (Exception e)
@@ -607,6 +771,10 @@ namespace RealityCollective.Utilities.WebRequestRest
                 return new Response(false, $"{responseHeaders}\n{webRequest.downloadHandler?.text}", null, webRequest.responseCode);
             }
 
+            if (readResponseData)
+            {
+                return new Response(true, webRequest.downloadHandler?.text, webRequest.downloadHandler?.data, webRequest.responseCode);
+            }
             switch (webRequest.downloadHandler)
             {
                 case DownloadHandlerFile _:
@@ -616,7 +784,7 @@ namespace RealityCollective.Utilities.WebRequestRest
                 case DownloadHandlerAssetBundle _:
                     return new Response(true, null, null, webRequest.responseCode);
                 case DownloadHandlerBuffer _:
-                    return new Response(true, null, webRequest.downloadHandler?.data, webRequest.responseCode);
+                    return new Response(true, webRequest.downloadHandler?.text, webRequest.downloadHandler?.data, webRequest.responseCode);
                 default:
                     return new Response(true, webRequest.downloadHandler?.text, webRequest.downloadHandler?.data, webRequest.responseCode);
             }
