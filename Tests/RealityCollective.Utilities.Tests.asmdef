@@ -1,0 +1,18 @@
+{
+    "name": "RealityCollective.Utilities.Tests",
+    "rootNamespace": "",
+    "references": [
+        "GUID:b2d046948d6452a4b8485efc9ce0f88c"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
