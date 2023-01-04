@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Linq;
 using Debug = UnityEngine.Debug;
 
 namespace RealityCollective.Extensions
@@ -189,6 +190,67 @@ namespace RealityCollective.Extensions
 
             Debug.LogError($"{nameof(FindTopmostGenericTypeArguments)} - Maximum recursion depth reached without finding generic type arguments.");
             return null;
+        }
+
+        public static HashSet<Type> FindCandidateInterfaceTypes(Type serviceType, Type[] exclusions)
+        {
+            var derivedTypeInterfaces = new HashSet<Type>(serviceType.GetInterfaces());
+            var toRemove = new HashSet<Type>();
+
+            foreach (var type in derivedTypeInterfaces)
+            {
+                if (!exclusions.Contains(type))
+                {
+                    toRemove.Add(type);
+                }
+            }
+            derivedTypeInterfaces.ExceptWith(toRemove);
+
+            if (serviceType.BaseType != null)
+            {
+                toRemove.Clear();
+                var baseInterfaces = new HashSet<Type>(serviceType.BaseType.GetInterfaces());
+
+                // If interfaces on the base type and most derived type match exactly, that means
+                // that both declare the same set of interfaces, if we were to filter the base types out
+                // now, we'd end up having nothing, because 1 - 1 = 0.
+                // In this case we don't worry about filtering the base types because the next filter will
+                // make sure interface inheritance is filtered out.
+                foreach (var baseType in baseInterfaces)
+                {
+                    if (derivedTypeInterfaces.Contains(baseType))
+                    {
+                        continue;
+                    }
+
+                    toRemove.Add(baseType);
+                }
+
+                derivedTypeInterfaces.ExceptWith(toRemove);
+            }
+
+            // We want to remove interfaces that are implemented by other interfaces
+            // i.e
+            // public interface A : B {}
+            // public interface B {}
+            // public class Top : A {} → We only want to dump interface A so interface B must be removed
+
+            // Considering class A given above allInterfaces contains A and B now.
+            toRemove.Clear();
+            foreach (var implementedByMostDerivedClass in derivedTypeInterfaces)
+            {
+                // For interface A this will only contain single element, namely B
+                // For interface B this will an empty array
+                var derrivedInterfaces = implementedByMostDerivedClass.GetInterfaces();
+                foreach (var implementedByOtherInterfaces in derrivedInterfaces)
+                {
+                    toRemove.Add(implementedByOtherInterfaces);
+                }
+            }
+
+            // Finally remove the interfaces that do not belong to the most derived class.
+            derivedTypeInterfaces.ExceptWith(toRemove);
+            return derivedTypeInterfaces;
         }
     }
 }
