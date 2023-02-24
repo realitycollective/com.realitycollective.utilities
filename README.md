@@ -5,7 +5,7 @@ A collection of useful utilities for Unity Projects by the Reality Collective.  
 ## What's included?
 <!-- Fill in list of what is included here -->
 
-tbc
+tbc.
 
 ## Requirements
 <!-- Fill in list of requirements here -->
