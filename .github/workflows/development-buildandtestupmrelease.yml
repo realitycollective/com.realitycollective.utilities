@@ -21,15 +21,6 @@ jobs:
     with:
       build-host: ubuntu-latest
 
-  # Validate output parameters from the Validate-Environment job
-  Check-Params-unityversion:
-    needs: validate-environment
-    uses: realitycollective/reusableworkflows/.github/workflows/testparams.yml@v2-beta
-    name: Test output from Validate
-    with:
-      build-host: ubuntu-latest
-      teststring: ${{ needs.validate-environment.outputs.unityversion }}
-
   # Check Unity Hub and Editor Environment
   Validate-Unity:
     name: Validate Unity Install
@@ -38,16 +29,6 @@ jobs:
     with:
       build-target: windows
       unityversion: ${{ needs.validate-environment.outputs.unityversion }}
-
-
-  # Validate output parameters from the Validate-Environment job
-  Check-Params-unityeditorversion:
-    needs: Validate-Unity
-    uses: realitycollective/reusableworkflows/.github/workflows/testparams.yml@v2-beta
-    name: Test output from Validate
-    with:
-      build-host: ubuntu-latest
-      teststring: ${{ needs.Validate-Unity.outputs.unityeditorversion }}   
 
   # Run Unity unit tests defined in the package
   Run-Unit-Tests:
