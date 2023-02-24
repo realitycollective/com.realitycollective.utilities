@@ -87,4 +87,5 @@ jobs:
       build-host: ubuntu-latest
       build-type: patch
       target-branch: development
+      createTag: false
     secrets: inherit
