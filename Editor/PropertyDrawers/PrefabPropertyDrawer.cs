@@ -22,7 +22,7 @@ namespace RealityCollective.Editor.PropertyDrawers
                (property.objectReferenceValue is GameObject || property.objectReferenceValue == null))
             {
                 EditorGUI.BeginChangeCheck();
-                EditorGUI.PropertyField(position, property);
+                EditorGUI.PropertyField(position, property, label);
 
                 if (!EditorGUI.EndChangeCheck()) { return; }
                 if (property.objectReferenceValue == null) { return; }
