@@ -1,4 +1,4 @@
-﻿// Copyright (c) XRTK. All rights reserved.
+﻿// Copyright (c) Reality Collective. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
@@ -13,6 +13,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using RealityCollective.Extensions;
+using System.Security.Cryptography;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace RealityCollective.Utilities.WebRequestRest
 {
@@ -60,51 +62,49 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// <param name="headers">Optional header information for the request.</param>
         /// <param name="progress">Optional <see cref="IProgress{T}"/> handler.</param>
         /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The response data.</returns>
-        public static async Task<Response> GetAsync(string query, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1)
+        public static async Task<Response> GetAsync(string query, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1, CancellationToken cancellationToken = default)
         {
-            using (var webRequest = UnityWebRequest.Get(query))
-            {
-                return await ProcessRequestAsync(webRequest, headers, progress, timeout);
-            }
+            using var webRequest = UnityWebRequest.Get(query);
+            return await ProcessRequestAsync(webRequest, headers, progress, timeout, cancellationToken);
         }
-        
+
         /// <summary>
         /// Rest GET.
         /// </summary>
         /// <param name="query">Finalized Endpoint Query with parameters.</param>
-        /// <param name="headers">Optional header information for the request.</param>
-        /// <param name="timeout">Optional time in seconds before request expires.</param>
-        /// <param name="downloadHandler">Optional DownloadHandler for the request.</param>
         /// <param name="readResponseData">Optional bool. If its true, response data will be read from web request download handler.</param>
         /// <param name="certificateHandler">Optional certificate handler for custom certificate verification</param>
         /// <param name="disposeCertificateHandlerOnDispose">Optional bool. If true and <paramref name="certificateHandler"/> is not null, <paramref name="certificateHandler"/> will be disposed, when the underlying UnityWebRequest is disposed.</param>
+        /// <param name="downloadHandler">Optional DownloadHandler for the request.</param>
+        /// <param name="headers">Optional header information for the request.</param>
+        /// <param name="progress">Optional <see cref="IProgress{T}"/> handler.</param>
+        /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The response data.</returns>
         public static async Task<Response> GetAsync(
             string query,
+            bool readResponseData,
+            CertificateHandler certificateHandler,
+            bool disposeCertificateHandlerOnDispose,
             DownloadHandler downloadHandler = null,
-            bool readResponseData = false,
-            CertificateHandler certificateHandler = null,
-            bool disposeCertificateHandlerOnDispose = true,
-            CancellationToken cancellationToken = default(CancellationToken),
             Dictionary<string, string> headers = null,
             IProgress<float> progress = null,
-            int timeout = -1
-            )
+            int timeout = -1,
+            CancellationToken cancellationToken = default)
         {
-            using (var webRequest = UnityWebRequest.Get(query))
+            using var webRequest = UnityWebRequest.Get(query);
+            if (downloadHandler != null)
             {
-                if (downloadHandler != null)
-                {
-                    webRequest.downloadHandler = downloadHandler;
-                }
-                cancellationToken.Register(() =>
-                {
-                    webRequest.Abort();
-                });
-
-                return await ProcessRequestAsync(webRequest, headers, progress, timeout, readResponseData, certificateHandler, disposeCertificateHandlerOnDispose);
+                webRequest.downloadHandler = downloadHandler;
             }
+            cancellationToken.Register(() =>
+            {
+                webRequest.Abort();
+            });
+
+            return await ProcessRequestAsync(webRequest, certificateHandler, disposeCertificateHandlerOnDispose, headers, progress, timeout, cancellationToken, readResponseData);
         }
 
         #endregion GET
@@ -118,13 +118,16 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// <param name="headers">Optional header information for the request.</param>
         /// <param name="progress">Optional <see cref="IProgress{T}"/> handler.</param>
         /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The response data.</returns>
-        public static async Task<Response> PostAsync(string query, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1)
+        public static async Task<Response> PostAsync(string query, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1, CancellationToken cancellationToken = default)
         {
-            using (var webRequest = UnityWebRequest.Post(query, null as string))
-            {
-                return await ProcessRequestAsync(webRequest, headers, progress, timeout);
-            }
+#if UNITY_2022_2_OR_NEWER
+            using var webRequest = UnityWebRequest.PostWwwForm(query, null);
+#else
+            using var webRequest = UnityWebRequest.Post(query, null as string);
+#endif
+            return await ProcessRequestAsync(webRequest, headers, progress, timeout, cancellationToken);
         }
 
         /// <summary>
@@ -135,13 +138,16 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// <param name="headers">Optional header information for the request.</param>
         /// <param name="progress">Optional <see cref="IProgress{T}"/> handler.</param>
         /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The response data.</returns>
-        public static async Task<Response> PostAsync(string query, WWWForm formData, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1)
+        public static async Task<Response> PostAsync(string query, WWWForm formData, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1, CancellationToken cancellationToken = default)
         {
-            using (var webRequest = UnityWebRequest.Post(query, formData))
-            {
-                return await ProcessRequestAsync(webRequest, headers, progress, timeout);
-            }
+#if UNITY_2022_2_OR_NEWER
+            using var webRequest = UnityWebRequest.PostWwwForm(query, formData);
+#else
+            using var webRequest = UnityWebRequest.Post(query, formData);
+#endif
+            return await ProcessRequestAsync(webRequest, headers, progress, timeout, cancellationToken);
         }
 
         /// <summary>
@@ -152,18 +158,21 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// <param name="headers">Optional header information for the request.</param>
         /// <param name="progress">Optional <see cref="IProgress{T}"/> handler.</param>
         /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The response data.</returns>
-        public static async Task<Response> PostAsync(string query, string jsonData, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1)
+        public static async Task<Response> PostAsync(string query, string jsonData, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1, CancellationToken cancellationToken = default)
         {
-            using (var webRequest = UnityWebRequest.Post(query, "POST"))
-            {
-                var data = new UTF8Encoding().GetBytes(jsonData);
-                webRequest.uploadHandler = new UploadHandlerRaw(data);
-                webRequest.downloadHandler = new DownloadHandlerBuffer();
-                webRequest.SetRequestHeader("Content-Type", "application/json");
-                webRequest.SetRequestHeader("Accept", "application/json");
-                return await ProcessRequestAsync(webRequest, headers, progress, timeout);
-            }
+#if UNITY_2022_2_OR_NEWER
+            using var webRequest = UnityWebRequest.PostWwwForm(query, "POST");
+#else
+            using var webRequest = UnityWebRequest.Post(query, "POST");
+#endif
+            var data = new UTF8Encoding().GetBytes(jsonData);
+            webRequest.uploadHandler = new UploadHandlerRaw(data);
+            webRequest.downloadHandler = new DownloadHandlerBuffer();
+            webRequest.SetRequestHeader("Content-Type", "application/json");
+            webRequest.SetRequestHeader("Accept", "application/json");
+            return await ProcessRequestAsync(webRequest, headers, progress, timeout, cancellationToken);
         }
 
         /// <summary>
@@ -174,80 +183,85 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// <param name="headers">Optional header information for the request.</param>
         /// <param name="progress">Optional <see cref="IProgress{T}"/> handler.</param>
         /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The response data.</returns>
-        public static async Task<Response> PostAsync(string query, byte[] bodyData, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1)
+        public static async Task<Response> PostAsync(string query, byte[] bodyData, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1, CancellationToken cancellationToken = default)
         {
-            using (var webRequest = UnityWebRequest.Post(query, "POST"))
-            {
-                webRequest.uploadHandler = new UploadHandlerRaw(bodyData);
-                webRequest.downloadHandler = new DownloadHandlerBuffer();
-                webRequest.SetRequestHeader("Content-Type", "application/octet-stream");
-                return await ProcessRequestAsync(webRequest, headers, progress, timeout);
-            }
+#if UNITY_2022_2_OR_NEWER
+            using var webRequest = UnityWebRequest.PostWwwForm(query, "POST");
+#else
+            using var webRequest = UnityWebRequest.Post(query, "POST");
+#endif
+            webRequest.uploadHandler = new UploadHandlerRaw(bodyData);
+            webRequest.downloadHandler = new DownloadHandlerBuffer();
+            webRequest.SetRequestHeader("Content-Type", "application/octet-stream");
+            return await ProcessRequestAsync(webRequest, headers, progress, timeout, cancellationToken);
         }
-        
+
         /// <summary>
         /// Rest POST.
         /// </summary>
         /// <param name="query">Finalized Endpoint Query with parameters.</param>
-        /// <param name="headers">Optional header information for the request.</param>
-        /// <param name="timeout">Optional time in seconds before request expires.</param>
-        /// <param name="readResponseData">Optional bool. If its true, response data will be read from web request download handler.</param>
         /// <param name="certificateHandler">Optional certificate handler for custom certificate verification</param>
         /// <param name="disposeCertificateHandlerOnDispose">Optional bool. If true and <paramref name="certificateHandler"/> is not null, <paramref name="certificateHandler"/> will be disposed, when the underlying UnityWebRequest is disposed.</param>
+        /// <param name="readResponseData">Optional bool. If its true, response data will be read from web request download handler.</param>
+        /// <param name="headers">Optional header information for the request.</param>
+        /// <param name="progress">Optional <see cref="IProgress{T}"/> handler.</param>
+        /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The response data.</returns>
         public static async Task<Response> PostAsync(
             string query,
+            CertificateHandler certificateHandler,
+            bool disposeCertificateHandlerOnDispose,
             bool readResponseData = false,
-            CertificateHandler certificateHandler = null,
-            bool disposeCertificateHandlerOnDispose = true,
-            CancellationToken cancellationToken = default(CancellationToken),
             Dictionary<string, string> headers = null,
             IProgress<float> progress = null,
-            int timeout = -1
-)
+            int timeout = -1,
+            CancellationToken cancellationToken = default
+            )
         {
-            using (var webRequest = UnityWebRequest.Post(query, null as string))
-            {
-                cancellationToken.Register(() =>
-                {
-                    webRequest.Abort();
-                });
-                return await ProcessRequestAsync(webRequest, headers, progress, timeout, readResponseData, certificateHandler, disposeCertificateHandlerOnDispose);
-            }
+#if UNITY_2022_2_OR_NEWER
+            using var webRequest = UnityWebRequest.PostWwwForm(query, "POST");
+#else
+            using var webRequest = UnityWebRequest.Post(query, "POST");
+#endif
+
+            return await ProcessRequestAsync(webRequest, certificateHandler, disposeCertificateHandlerOnDispose, headers, progress, timeout, cancellationToken, readResponseData);
         }
-        
+
         /// <summary>
         /// Rest POST.
         /// </summary>
         /// <param name="query">Finalized Endpoint Query with parameters.</param>
         /// <param name="formData">Form Data.</param>
-        /// <param name="headers">Optional header information for the request.</param>
-        /// <param name="timeout">Optional time in seconds before request expires.</param>
         /// <param name="readResponseData">Optional bool. If its true, response data will be read from web request download handler.</param>
         /// <param name="certificateHandler">Optional certificate handler for custom certificate verification</param>
         /// <param name="disposeCertificateHandlerOnDispose">Optional bool. If true and <paramref name="certificateHandler"/> is not null, <paramref name="certificateHandler"/> will be disposed, when the underlying UnityWebRequest is disposed.</param>
+        /// <param name="headers">Optional header information for the request.</param>
+        /// <param name="progress">Optional <see cref="IProgress{T}"/> handler.</param>
+        /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The response data.</returns>
         public static async Task<Response> PostAsync(
             string query,
             WWWForm formData,
-            bool readResponseData = false,
-            CertificateHandler certificateHandler = null,
-            bool disposeCertificateHandlerOnDispose = true,
-            CancellationToken cancellationToken = default(CancellationToken),
+            bool readResponseData,
+            CertificateHandler certificateHandler,
+            bool disposeCertificateHandlerOnDispose,
             Dictionary<string, string> headers = null,
             IProgress<float> progress = null,
-            int timeout = -1
+            int timeout = -1,
+            CancellationToken cancellationToken = default
             )
         {
-            using (var webRequest = UnityWebRequest.Post(query, formData))
-            {
-                cancellationToken.Register(() =>
-                {
-                    webRequest.Abort();
-                });
-                return await ProcessRequestAsync(webRequest, headers, progress, timeout, readResponseData, certificateHandler, disposeCertificateHandlerOnDispose);
-            }
+#if UNITY_2022_2_OR_NEWER
+            using var webRequest = UnityWebRequest.PostWwwForm(query, formData);
+#else
+            using var webRequest = UnityWebRequest.Post(query, formData);
+#endif
+
+            return await ProcessRequestAsync(webRequest, certificateHandler, disposeCertificateHandlerOnDispose, headers, progress, timeout, cancellationToken, readResponseData);
         }
 
         #endregion POST
@@ -262,14 +276,13 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// <param name="headers">Optional header information for the request.</param>
         /// <param name="progress">Optional <see cref="IProgress{T}"/> handler.</param>
         /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The response data.</returns>
-        public static async Task<Response> PutAsync(string query, string jsonData, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1)
+        public static async Task<Response> PutAsync(string query, string jsonData, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1, CancellationToken cancellationToken = default)
         {
-            using (var webRequest = UnityWebRequest.Put(query, jsonData))
-            {
-                webRequest.SetRequestHeader("Content-Type", "application/json");
-                return await ProcessRequestAsync(webRequest, headers, progress, timeout);
-            }
+            using var webRequest = UnityWebRequest.Put(query, jsonData);
+            webRequest.SetRequestHeader("Content-Type", "application/json");
+            return await ProcessRequestAsync(webRequest, headers, progress, timeout, cancellationToken);
         }
 
         /// <summary>
@@ -280,48 +293,43 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// <param name="headers">Optional header information for the request.</param>
         /// <param name="progress">Optional <see cref="IProgress{T}"/> handler.</param>
         /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The response data.</returns>
-        public static async Task<Response> PutAsync(string query, byte[] bodyData, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1)
+        public static async Task<Response> PutAsync(string query, byte[] bodyData, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1, CancellationToken cancellationToken = default)
         {
-            using (var webRequest = UnityWebRequest.Put(query, bodyData))
-            {
-                webRequest.SetRequestHeader("Content-Type", "application/octet-stream");
-                return await ProcessRequestAsync(webRequest, headers, progress, timeout);
-            }
+            using var webRequest = UnityWebRequest.Put(query, bodyData);
+            webRequest.SetRequestHeader("Content-Type", "application/octet-stream");
+            return await ProcessRequestAsync(webRequest, headers, progress, timeout, cancellationToken);
         }
-        
+
         /// <summary>
         /// Rest PUT.
         /// </summary>
         /// <param name="query">Finalized Endpoint Query with parameters.</param>
         /// <param name="bodyData">Data to be submitted.</param>
-        /// <param name="headers">Optional header information for the request.</param>
-        /// <param name="timeout">Optional time in seconds before request expires.</param>
         /// <param name="readResponseData">Optional bool. If its true, response data will be read from web request download handler.</param>
         /// <param name="certificateHandler">Optional certificate handler for custom certificate verification</param>
         /// <param name="disposeCertificateHandlerOnDispose">Optional bool. If true and <paramref name="certificateHandler"/> is not null, <paramref name="certificateHandler"/> will be disposed, when the underlying UnityWebRequest is disposed.</param>
+        /// <param name="headers">Optional header information for the request.</param>
+        /// <param name="progress">Optional <see cref="IProgress{T}"/> handler.</param>
+        /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The response data.</returns>
         public static async Task<Response> PutAsync(
             string query,
             byte[] bodyData,
-            bool readResponseData = false,
-            CertificateHandler certificateHandler = null,
-            bool disposeCertificateHandlerOnDispose = true,
-            CancellationToken cancellationToken = default(CancellationToken),
+            bool readResponseData,
+            CertificateHandler certificateHandler,
+            bool disposeCertificateHandlerOnDispose,
             Dictionary<string, string> headers = null,
             IProgress<float> progress = null,
-            int timeout = -1
-            )
+            int timeout = -1,
+            CancellationToken cancellationToken = default)
         {
-            using (var webRequest = UnityWebRequest.Put(query, bodyData))
-            {
-                cancellationToken.Register(() =>
-                {
-                    webRequest.Abort();
-                });
-                webRequest.SetRequestHeader("Content-Type", "application/octet-stream");
-                return await ProcessRequestAsync(webRequest, headers, progress, timeout, readResponseData, certificateHandler, disposeCertificateHandlerOnDispose);
-            }
+            using var webRequest = UnityWebRequest.Put(query, bodyData);
+            webRequest.SetRequestHeader("Content-Type", "application/octet-stream");
+
+            return await ProcessRequestAsync(webRequest, certificateHandler, disposeCertificateHandlerOnDispose, headers, progress, timeout, cancellationToken, readResponseData);
         }
 
         #endregion PUT
@@ -335,52 +343,69 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// <param name="headers">Optional header information for the request.</param>
         /// <param name="progress">Optional <see cref="IProgress{T}"/> handler.</param>
         /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The response data.</returns>
-        public static async Task<Response> DeleteAsync(string query, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1)
+        public static async Task<Response> DeleteAsync(string query, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1, CancellationToken cancellationToken = default)
         {
-            using (var webRequest = UnityWebRequest.Delete(query))
-            {
-                return await ProcessRequestAsync(webRequest, headers, progress, timeout);
-            }
+            using var webRequest = UnityWebRequest.Delete(query);
+            return await ProcessRequestAsync(webRequest, headers, progress, timeout, cancellationToken);
         }
-        
+
         /// <summary>
         /// Rest DELETE.
         /// </summary>
         /// <param name="query">Finalized Endpoint Query with parameters.</param>
-        /// <param name="headers">Optional header information for the request.</param>
-        /// <param name="timeout">Optional time in seconds before request expires.</param>
         /// <param name="readResponseData">Optional bool. If its true, response data will be read from web request download handler.</param>
         /// <param name="certificateHandler">Optional certificate handler for custom certificate verification</param>
         /// <param name="disposeCertificateHandlerOnDispose">Optional bool. If true and <paramref name="certificateHandler"/> is not null, <paramref name="certificateHandler"/> will be disposed, when the underlying UnityWebRequest is disposed.</param>
+        /// <param name="headers">Optional header information for the request.</param>
+        /// <param name="progress">Optional <see cref="IProgress{T}"/> handler.</param>
+        /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The response data.</returns>
         public static async Task<Response> DeleteAsync(
             string query,
-            bool readResponseData = false,
-            CertificateHandler certificateHandler = null,
-            bool disposeCertificateHandlerOnDispose = true,
-            CancellationToken cancellationToken = default(CancellationToken),
+            bool readResponseData,
+            CertificateHandler certificateHandler,
+            bool disposeCertificateHandlerOnDispose,
             Dictionary<string, string> headers = null,
             IProgress<float> progress = null,
-            int timeout = -1
-            )
+            int timeout = -1,
+            CancellationToken cancellationToken = default)
         {
-            using (var webRequest = UnityWebRequest.Delete(query))
-            {
-                cancellationToken.Register(() =>
-                {
-                    webRequest.Abort();
-                });
-                return await ProcessRequestAsync(webRequest, headers, progress, timeout,readResponseData, certificateHandler, disposeCertificateHandlerOnDispose);
-            }
+            using var webRequest = UnityWebRequest.Delete(query);
+
+            return await ProcessRequestAsync(webRequest, certificateHandler, disposeCertificateHandlerOnDispose, headers, progress, timeout, cancellationToken, readResponseData);
         }
 
         #endregion DELETE
 
         #region Get Multimedia Content
 
-        public static string DownloadCacheDirectory => $"{Application.temporaryCachePath}{Path.DirectorySeparatorChar}download_cache";
+        #region Download Cache
 
+        private const string DOWNLOAD_CACHE = "download_cache";
+
+        /// <summary>
+        /// Generates a <see cref="Guid"/> based on the string.
+        /// </summary>
+        /// <param name="string">The string to generate the <see cref="Guid"/>.</param>
+        /// <returns>A new <see cref="Guid"/> that represents the string.</returns>
+        private static Guid GenerateGuid(string @string)
+        {
+            using MD5 md5 = MD5.Create();
+            return new Guid(md5.ComputeHash(Encoding.Default.GetBytes(@string)));
+        }
+
+        /// <summary>
+        /// The download cache directory.
+        /// </summary>
+        public static string DownloadCacheDirectory
+            => Path.Combine(Application.temporaryCachePath, DOWNLOAD_CACHE);
+
+        /// <summary>
+        /// Creates the <see cref="DownloadCacheDirectory"/> if it does not exist.
+        /// </summary>
         public static void ValidateCacheDirectory()
         {
             if (!Directory.Exists(DownloadCacheDirectory))
@@ -398,8 +423,18 @@ namespace RealityCollective.Utilities.WebRequestRest
         public static bool TryGetDownloadCacheItem(string uri, out string filePath)
         {
             ValidateCacheDirectory();
-            filePath = $"{DownloadCacheDirectory}{Path.DirectorySeparatorChar}{uri.GenerateGuid()}";
-            var exists = File.Exists(filePath);
+            bool exists;
+
+            if (TryGetFileNameFromUrl(uri, out var fileName))
+            {
+                filePath = Path.Combine(DownloadCacheDirectory, fileName);
+                exists = File.Exists(filePath);
+            }
+            else
+            {
+                filePath = Path.Combine(DownloadCacheDirectory, GenerateGuid(uri).ToString());
+                exists = File.Exists(filePath);
+            }
 
             if (exists)
             {
@@ -416,21 +451,21 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// <returns>True, if the cached item was successfully deleted.</returns>
         public static bool TryDeleteCacheItem(string uri)
         {
-            if (TryGetDownloadCacheItem(uri, out var filePath))
+            if (!TryGetDownloadCacheItem(uri, out var filePath))
             {
-                try
-                {
-                    File.Delete(filePath);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError(e);
-                }
-
-                return !File.Exists(filePath);
+                return false;
             }
 
-            return false;
+            try
+            {
+                File.Delete(filePath);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+
+            return !File.Exists(filePath);
         }
 
         /// <summary>
@@ -445,55 +480,79 @@ namespace RealityCollective.Utilities.WebRequestRest
         }
 
         /// <summary>
+        /// Find the filename based on the url.
+        /// </summary>
+        /// <param name="url">The url to parse to try to guess file name.</param>
+        /// <param name="fileName">The filename if found.</param>
+        /// <returns>True, if a valid filename is found.</returns>
+        private static bool TryGetFileNameFromUrl(string url, out string fileName)
+        {
+            var baseUrl = url.Split('?')[0];
+            var index = baseUrl.LastIndexOf('/') + 1;
+            fileName = baseUrl.Substring(index, baseUrl.Length - index);
+            return Path.HasExtension(fileName);
+        }
+
+        #endregion Download Cache
+
+        /// <summary>
         /// Download a <see cref="Texture2D"/> from the provided <see cref="url"/>.
         /// </summary>
         /// <param name="url">The url to download the <see cref="Texture2D"/> from.</param>
+        /// <param name="fileName">Optional, file name to download (including extension).</param>
         /// <param name="headers">Optional header information for the request.</param>
         /// <param name="progress">Optional <see cref="IProgress{T}"/> handler.</param>
         /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A new <see cref="Texture2D"/> instance.</returns>
-        public static async Task<Texture2D> DownloadTextureAsync(string url, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1)
+        public static async Task<Texture2D> DownloadTextureAsync(string url, string fileName = null, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1, CancellationToken cancellationToken = default)
         {
             await Awaiters.UnityMainThread;
 
-            bool isCached = TryGetDownloadCacheItem(url, out var cachePath);
+            bool isCached;
+            string cachePath;
 
-            if (isCached)
+            if (string.IsNullOrWhiteSpace(fileName))
             {
-                url = cachePath;
+                TryGetFileNameFromUrl(url, out fileName);
             }
 
-            using (var webRequest = UnityWebRequestTexture.GetTexture(url))
+            if (url.Contains("file://"))
             {
-                var response = await ProcessRequestAsync(webRequest, headers, progress, timeout);
-
-                if (!response.Successful)
-                {
-                    Debug.LogError($"Failed to download texture from \"{url}\"!");
-
-                    return null;
-                }
-
-                var downloadHandler = (DownloadHandlerTexture)webRequest.downloadHandler;
-
-                if (!isCached &&
-                    !File.Exists(cachePath))
-                {
-                    try
-                    {
-                        using (var fileStream = File.OpenWrite(cachePath))
-                        {
-                            await fileStream.WriteAsync(downloadHandler.data, 0, downloadHandler.data.Length, CancellationToken.None);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError($"Failed to write texture to disk!\n{e}");
-                    }
-                }
-
-                return downloadHandler.texture;
+                isCached = true;
+                cachePath = url;
             }
+            else
+            {
+                isCached = TryGetDownloadCacheItem(fileName, out cachePath);
+            }
+
+            using var webRequest = UnityWebRequestTexture.GetTexture(url);
+            var response = await ProcessRequestAsync(webRequest, headers, progress, timeout, cancellationToken);
+
+            if (!response.Successful)
+            {
+                Debug.LogError(GenerateErrorMessage("texture", url, response));
+                return null;
+            }
+
+            var downloadHandler = (DownloadHandlerTexture)webRequest.downloadHandler;
+
+            if (!isCached &&
+                !File.Exists(cachePath))
+            {
+                try
+                {
+                    using var fileStream = File.OpenWrite(cachePath);
+                    await fileStream.WriteAsync(downloadHandler.data, 0, downloadHandler.data.Length, CancellationToken.None);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"Failed to write texture to disk!\n{e}");
+                }
+            }
+
+            return downloadHandler.texture;
         }
 
         /// <summary>
@@ -501,52 +560,65 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// </summary>
         /// <param name="url">The url to download the <see cref="AudioClip"/> from.</param>
         /// <param name="audioType"><see cref="AudioType"/> to download.</param>
+        /// <param name="fileName">Optional, file name to download (including extension).</param>
         /// <param name="headers">Optional header information for the request.</param>
         /// <param name="progress">Optional <see cref="IProgress{T}"/> handler.</param>
         /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A new <see cref="AudioClip"/> instance.</returns>
-        public static async Task<AudioClip> DownloadAudioClipAsync(string url, AudioType audioType, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1)
+        public static async Task<AudioClip> DownloadAudioClipAsync(string url, AudioType audioType, string fileName = "", Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1, CancellationToken cancellationToken = default)
         {
             await Awaiters.UnityMainThread;
 
-            bool isCached = TryGetDownloadCacheItem(url, out var cachePath);
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                TryGetFileNameFromUrl(url, out fileName);
+            }
+
+            bool isCached;
+            string cachePath;
+
+            if (url.Contains("file://"))
+            {
+                isCached = true;
+                cachePath = url;
+            }
+            else
+            {
+                isCached = TryGetDownloadCacheItem(fileName, out cachePath);
+            }
 
             if (isCached)
             {
                 url = cachePath;
             }
 
-            using (var webRequest = UnityWebRequestMultimedia.GetAudioClip(url, audioType))
+            using var webRequest = UnityWebRequestMultimedia.GetAudioClip(url, audioType);
+            var response = await ProcessRequestAsync(webRequest, headers, progress, timeout, cancellationToken);
+
+            if (!response.Successful)
             {
-                var response = await ProcessRequestAsync(webRequest, headers, progress, timeout);
-
-                if (!response.Successful)
-                {
-                    Debug.LogError($"Failed to download audio clip from \"{url}\"!");
-
-                    return null;
-                }
-
-                var downloadHandler = (DownloadHandlerAudioClip)webRequest.downloadHandler;
-
-                if (!isCached &&
-                    !File.Exists(cachePath))
-                {
-                    try
-                    {
-                        using (var fileStream = File.OpenWrite(cachePath))
-                        {
-                            await fileStream.WriteAsync(downloadHandler.data, 0, downloadHandler.data.Length, CancellationToken.None);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError($"Failed to write audio asset to disk! {e}");
-                    }
-                }
-
-                return downloadHandler.audioClip;
+                Debug.LogError(GenerateErrorMessage("audio clip", url, response));
+                return null;
             }
+
+            var downloadHandler = (DownloadHandlerAudioClip)webRequest.downloadHandler;
+
+            if (!isCached &&
+                !File.Exists(cachePath))
+            {
+                try
+                {
+                    using var fileStream = File.OpenWrite(cachePath);
+                    await fileStream.WriteAsync(downloadHandler.data, 0, downloadHandler.data.Length, CancellationToken.None);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"Failed to write audio asset to disk! {e}");
+                }
+            }
+
+            return downloadHandler.audioClip;
         }
 
         /// <summary>
@@ -556,8 +628,9 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// <param name="options">Asset bundle request options.</param>
         /// <param name="headers">Optional header information for the request.</param>
         /// <param name="progress">Optional <see cref="IProgress{T}"/> handler.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>A new <see cref="AssetBundle"/> instance.</returns>
-        public static async Task<AssetBundle> DownloadAssetBundleAsync(string url, AssetBundleRequestOptions options, Dictionary<string, string> headers = null, IProgress<float> progress = null)
+        public static async Task<AssetBundle> DownloadAssetBundleAsync(string url, AssetBundleRequestOptions options, Dictionary<string, string> headers = null, IProgress<float> progress = null, CancellationToken cancellationToken = default)
         {
             await Awaiters.UnityMainThread;
 
@@ -611,7 +684,7 @@ namespace RealityCollective.Utilities.WebRequestRest
 
                 try
                 {
-                    response = await ProcessRequestAsync(webRequest, headers, progress, options?.Timeout ?? -1);
+                    response = await ProcessRequestAsync(webRequest, headers, progress, options?.Timeout ?? -1, cancellationToken);
                 }
                 catch (Exception e)
                 {
@@ -621,7 +694,7 @@ namespace RealityCollective.Utilities.WebRequestRest
 
                 if (!response.Successful)
                 {
-                    Debug.LogError($"Failed to download asset bundle from \"{url}\"!\n{response.ResponseCode}:{response.ResponseBody}");
+                    Debug.LogError(GenerateErrorMessage("asset bundle", url, response));
                     return null;
                 }
 
@@ -638,51 +711,45 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// <param name="headers">Optional header information for the request.</param>
         /// <param name="progress">Optional <see cref="IProgress{T}"/> handler.</param>
         /// <param name="timeout">Optional time in seconds before request expires.</param>
+        /// <param name="cancellationToken">Optional, <see cref="CancellationToken"/>.</param>
         /// <returns>The path to the downloaded file.</returns>
-        public static async Task<string> DownloadFileAsync(string url, string fileName = null, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1)
+        public static async Task<string> DownloadFileAsync(string url, string fileName = null, Dictionary<string, string> headers = null, IProgress<float> progress = null, int timeout = -1, CancellationToken cancellationToken = default)
         {
             await Awaiters.UnityMainThread;
 
             if (string.IsNullOrWhiteSpace(fileName))
             {
-                // We will try go guess the name based on the url endpoint.
-                var index = url.LastIndexOf('/');
-                fileName = url.Substring(index, url.Length - index);
+                TryGetFileNameFromUrl(url, out fileName);
             }
 
-            ValidateCacheDirectory();
-            var filePath = $"{DownloadCacheDirectory}{Path.DirectorySeparatorChar}{fileName}";
-
-            if (File.Exists(filePath))
+            if (TryGetDownloadCacheItem(fileName, out var filePath))
             {
                 return filePath;
             }
 
-            using (var webRequest = UnityWebRequest.Get(url))
-            using (var fileDownloadHandler = new DownloadHandlerFile(filePath)
+            using var webRequest = UnityWebRequest.Get(url);
+            using var fileDownloadHandler = new DownloadHandlerFile(filePath)
             {
                 removeFileOnAbort = true
-            })
+            };
+
+            webRequest.downloadHandler = fileDownloadHandler;
+            var response = await ProcessRequestAsync(webRequest, headers, progress, timeout, cancellationToken);
+
+            if (!response.Successful)
             {
-                webRequest.downloadHandler = fileDownloadHandler;
-                var response = await ProcessRequestAsync(webRequest, headers, progress, timeout);
-                fileDownloadHandler.Dispose();
-
-                if (!response.Successful)
-                {
-                    Debug.LogError($"Failed to download file from \"{url}\"!");
-
-                    return null;
-                }
-
-                return filePath;
+                Debug.LogError(GenerateErrorMessage("file", url, response));
+                return null;
             }
+
+            return filePath;
         }
 
         #endregion Get Multimedia Content
 
         #region Private Functions
-        private static async Task<Response> ProcessRequestAsync(UnityWebRequest webRequest, Dictionary<string, string> headers, IProgress<float> progress, int timeout, bool readResponseData = false, CertificateHandler certificateHandler = null, bool disposeCertificateHandlerOnDispose = true)
+
+        private static async Task<Response> ProcessRequestAsync(UnityWebRequest webRequest, Dictionary<string, string> headers, IProgress<float> progress, int timeout, CancellationToken cancellationToken, bool readResponseData = false)
         {
             await Awaiters.UnityMainThread;
 
@@ -702,7 +769,6 @@ namespace RealityCollective.Utilities.WebRequestRest
             var isUpload = webRequest.method == UnityWebRequest.kHttpVerbPOST ||
                            webRequest.method == UnityWebRequest.kHttpVerbPUT;
 
-            // HACK: Workaround for extra quotes around boundary.
             if (isUpload)
             {
                 var contentType = webRequest.GetRequestHeader("Content-Type");
@@ -714,11 +780,15 @@ namespace RealityCollective.Utilities.WebRequestRest
                 }
             }
 
+            webRequest.disposeCertificateHandlerOnDispose = true;
+            webRequest.disposeDownloadHandlerOnDispose = true;
+            webRequest.disposeUploadHandlerOnDispose = true;
+
             Thread backgroundThread = null;
 
             if (progress != null)
             {
-                backgroundThread = new Thread(async () =>
+                async void ProgressReportingThread()
                 {
                     try
                     {
@@ -727,6 +797,12 @@ namespace RealityCollective.Utilities.WebRequestRest
                         while (!webRequest.isDone)
                         {
                             progress.Report(isUpload ? webRequest.uploadProgress : webRequest.downloadProgress * 100f);
+
+                            if (cancellationToken.IsCancellationRequested)
+                            {
+                                webRequest.Abort();
+                            }
+
                             await Awaiters.UnityMainThread;
                         }
                     }
@@ -734,7 +810,9 @@ namespace RealityCollective.Utilities.WebRequestRest
                     {
                         // Throw away
                     }
-                })
+                }
+
+                backgroundThread = new Thread(ProgressReportingThread)
                 {
                     IsBackground = true
                 };
@@ -744,8 +822,6 @@ namespace RealityCollective.Utilities.WebRequestRest
 
             try
             {
-                webRequest.certificateHandler = certificateHandler;
-                webRequest.disposeCertificateHandlerOnDispose = disposeCertificateHandlerOnDispose;
                 await webRequest.SendWebRequest();
             }
             catch (Exception e)
@@ -756,11 +832,8 @@ namespace RealityCollective.Utilities.WebRequestRest
             backgroundThread?.Join();
             progress?.Report(100f);
 
-#if UNITY_2020_1_OR_NEWER
-            if (webRequest.result == UnityWebRequest.Result.ConnectionError || webRequest.result == UnityWebRequest.Result.ProtocolError)
-#else
-            if (webRequest.isNetworkError || webRequest.isHttpError)
-#endif
+            if (webRequest.result ==
+                UnityWebRequest.Result.ConnectionError || webRequest.result == UnityWebRequest.Result.ProtocolError)
             {
                 if (webRequest.responseCode == 401)
                 {
@@ -777,10 +850,16 @@ namespace RealityCollective.Utilities.WebRequestRest
                 return new Response(false, $"{responseHeaders}\n{webRequest.downloadHandler?.text}", null, webRequest.responseCode);
             }
 
+            if (!string.IsNullOrEmpty(webRequest.downloadHandler.error))
+            {
+                return new Response(false, webRequest.downloadHandler.error, webRequest.downloadHandler.data, webRequest.responseCode);
+            }
+
             if (readResponseData)
             {
                 return new Response(true, webRequest.downloadHandler?.text, webRequest.downloadHandler?.data, webRequest.responseCode);
             }
+
             switch (webRequest.downloadHandler)
             {
                 case DownloadHandlerFile _:
@@ -794,6 +873,18 @@ namespace RealityCollective.Utilities.WebRequestRest
                 default:
                     return new Response(true, webRequest.downloadHandler?.text, webRequest.downloadHandler?.data, webRequest.responseCode);
             }
+        }
+
+        private static async Task<Response> ProcessRequestAsync(UnityWebRequest webRequest, CertificateHandler certificateHandler, bool disposeCertificateHandlerOnDispose, Dictionary<string, string> headers, IProgress<float> progress, int timeout, CancellationToken cancellationToken, bool readResponseData = false)
+        {
+            webRequest.certificateHandler = certificateHandler;
+            webRequest.disposeCertificateHandlerOnDispose = disposeCertificateHandlerOnDispose;
+            return await ProcessRequestAsync(webRequest, headers, progress, timeout, cancellationToken, readResponseData);
+        }
+
+        private static string GenerateErrorMessage(string typeName, string url, Response response)
+        {
+            return $"Failed to download {typeName} from \"{url}\"!\n{response.ResponseCode}:{response.ResponseBody}";
         }
         #endregion Private Functions
     }
