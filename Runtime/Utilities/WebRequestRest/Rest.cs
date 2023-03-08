@@ -93,11 +93,8 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// <returns>The response data.</returns>
         public static async Task<Response> PostAsync(string query, WWWForm formData, RestArgs postArgs = default)
         {
-#if UNITY_2022_2_OR_NEWER
-            using var webRequest = UnityWebRequest.PostWwwForm(query, formData);
-#else
+
             using var webRequest = UnityWebRequest.Post(query, formData);
-#endif
             return await ProcessRequestAsync(webRequest, postArgs);
         }
 
