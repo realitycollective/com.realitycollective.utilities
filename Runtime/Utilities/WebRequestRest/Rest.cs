@@ -108,9 +108,9 @@ namespace RealityCollective.Utilities.WebRequestRest
         public static async Task<Response> PostAsync(string query, string jsonData, RestArgs postArgs = default)
         {
 #if UNITY_2022_2_OR_NEWER
-            using var webRequest = UnityWebRequest.PostWwwForm(query, "POST");
+            using var webRequest = UnityWebRequest.PostWwwForm(query, UnityWebRequest.kHttpVerbPOST);
 #else
-            using var webRequest = UnityWebRequest.Post(query, "POST");
+            using var webRequest = UnityWebRequest.Post(query, UnityWebRequest.kHttpVerbPOST);
 #endif
             var data = new UTF8Encoding().GetBytes(jsonData);
             webRequest.uploadHandler = new UploadHandlerRaw(data);
@@ -130,9 +130,9 @@ namespace RealityCollective.Utilities.WebRequestRest
         public static async Task<Response> PostAsync(string query, byte[] bodyData, RestArgs postArgs = default)
         {
 #if UNITY_2022_2_OR_NEWER
-            using var webRequest = UnityWebRequest.PostWwwForm(query, "POST");
+            using var webRequest = UnityWebRequest.PostWwwForm(query, UnityWebRequest.kHttpVerbPOST);
 #else
-            using var webRequest = UnityWebRequest.Post(query, "POST");
+            using var webRequest = UnityWebRequest.Post(query, UnityWebRequest.kHttpVerbPOST);
 #endif
             webRequest.uploadHandler = new UploadHandlerRaw(bodyData);
             webRequest.downloadHandler = new DownloadHandlerBuffer();
