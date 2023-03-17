@@ -3,6 +3,7 @@
 
 using RealityCollective.Utilities.Async;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -20,10 +21,17 @@ namespace RealityCollective.Utilities.WebRequestRest
     /// </summary>
     public static class Rest
     {
-        /// <summary>
-        /// Use SSL Connections when making rest calls.
-        /// </summary>
-        public static bool UseSSL { get; set; } = true;
+        #region Global Properties
+        public static string DownloadLocation = Application.temporaryCachePath;
+        public static Dictionary<string, string> Headers = new Dictionary<string, string>();
+        public static IProgress<float> Progress = null;
+        public static int Timeout = 0;
+        public static CancellationToken CancellationToken;
+        public static bool ReadResponseData = false;
+        public static CertificateHandler CertificateHandler = null;
+        public static bool DisposeCertificateHandlerOnDispose = true;
+        public static bool ForceDownload = false;
+        #endregion
 
         #region Authentication
 
@@ -61,7 +69,15 @@ namespace RealityCollective.Utilities.WebRequestRest
         public static async Task<Response> GetAsync(string query, RestArgs getArgs = default)
         {
             using var webRequest = UnityWebRequest.Get(query);
-            return await ProcessRequestAsync(webRequest, getArgs);
+            try
+            {
+                return await ProcessRequestAsync(webRequest, getArgs);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(GenerateErrorRequest("Get", query, ex));
+                return Response.Failure;
+            }
         }
 
         #endregion GET
@@ -81,7 +97,15 @@ namespace RealityCollective.Utilities.WebRequestRest
 #else
             using var webRequest = UnityWebRequest.Post(query, null as string);
 #endif
-            return await ProcessRequestAsync(webRequest, postArgs);
+            try
+            {
+                return await ProcessRequestAsync(webRequest, postArgs);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(GenerateErrorRequest("Post", query, ex));
+                return Response.Failure;
+            }
         }
 
         /// <summary>
@@ -95,7 +119,15 @@ namespace RealityCollective.Utilities.WebRequestRest
         {
 
             using var webRequest = UnityWebRequest.Post(query, formData);
-            return await ProcessRequestAsync(webRequest, postArgs);
+            try
+            {
+                return await ProcessRequestAsync(webRequest, postArgs);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(GenerateErrorRequest("Post form", query, ex));
+                return Response.Failure;
+            }
         }
 
         /// <summary>
@@ -117,7 +149,15 @@ namespace RealityCollective.Utilities.WebRequestRest
             webRequest.downloadHandler = new DownloadHandlerBuffer();
             webRequest.SetRequestHeader("Content-Type", "application/json");
             webRequest.SetRequestHeader("Accept", "application/json");
-            return await ProcessRequestAsync(webRequest, postArgs);
+            try
+            {
+                return await ProcessRequestAsync(webRequest, postArgs);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(GenerateErrorRequest("Post json", query, ex));
+                return Response.Failure;
+            }
         }
 
         /// <summary>
@@ -137,7 +177,15 @@ namespace RealityCollective.Utilities.WebRequestRest
             webRequest.uploadHandler = new UploadHandlerRaw(bodyData);
             webRequest.downloadHandler = new DownloadHandlerBuffer();
             webRequest.SetRequestHeader("Content-Type", "application/octet-stream");
-            return await ProcessRequestAsync(webRequest, postArgs);
+            try
+            {
+                return await ProcessRequestAsync(webRequest, postArgs);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(GenerateErrorRequest("Post Bytes", query, ex));
+                return Response.Failure;
+            }
         }
 
         #endregion POST
@@ -155,7 +203,15 @@ namespace RealityCollective.Utilities.WebRequestRest
         {
             using var webRequest = UnityWebRequest.Put(query, jsonData);
             webRequest.SetRequestHeader("Content-Type", "application/json");
-            return await ProcessRequestAsync(webRequest, putArgs);
+            try
+            {
+                return await ProcessRequestAsync(webRequest, putArgs);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(GenerateErrorRequest("Put json", query, ex));
+                return Response.Failure;
+            }
         }
 
         /// <summary>
@@ -169,7 +225,15 @@ namespace RealityCollective.Utilities.WebRequestRest
         {
             using var webRequest = UnityWebRequest.Put(query, bodyData);
             webRequest.SetRequestHeader("Content-Type", "application/octet-stream");
-            return await ProcessRequestAsync(webRequest, putArgs);
+            try
+            {
+                return await ProcessRequestAsync(webRequest, putArgs);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(GenerateErrorRequest("Put bytes", query, ex));
+                return Response.Failure;
+            }
         }
 
         #endregion PUT
@@ -185,7 +249,15 @@ namespace RealityCollective.Utilities.WebRequestRest
         public static async Task<Response> DeleteAsync(string query, RestArgs deleteArgs = default)
         {
             using var webRequest = UnityWebRequest.Delete(query);
-            return await ProcessRequestAsync(webRequest, deleteArgs);
+            try
+            {
+                return await ProcessRequestAsync(webRequest, deleteArgs);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(GenerateErrorRequest("Delete", query, ex));
+                return Response.Failure;
+            }
         }
 
         #endregion DELETE
@@ -208,7 +280,7 @@ namespace RealityCollective.Utilities.WebRequestRest
         }
 
         /// <summary>
-        /// The download cache directory.
+        /// The download cache directory.<br/>
         /// </summary>
         public static string DownloadCacheDirectory
             => Path.Combine(Application.temporaryCachePath, DOWNLOAD_CACHE);
@@ -216,11 +288,11 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// <summary>
         /// Creates the <see cref="DownloadCacheDirectory"/> if it does not exist.
         /// </summary>
-        public static void ValidateCacheDirectory()
+        public static void ValidateCacheDirectory(string DownloadDirectory)
         {
-            if (!Directory.Exists(DownloadCacheDirectory))
+            if (!Directory.Exists(DownloadDirectory))
             {
-                Directory.CreateDirectory(DownloadCacheDirectory);
+                Directory.CreateDirectory(DownloadDirectory);
             }
         }
 
@@ -230,25 +302,34 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// <param name="uri">The uri key of the item.</param>
         /// <param name="filePath">The file path to the cached item.</param>
         /// <returns>True, if the item was in cache, otherwise false.</returns>
-        public static bool TryGetDownloadCacheItem(string uri, out string filePath)
+        public static bool TryGetDownloadCacheItem(string uri, out string filePath, string downloadDirectory = "", bool forceDownload = false)
         {
-            ValidateCacheDirectory();
+            var downloadLocation = string.IsNullOrEmpty(downloadDirectory) ? DownloadCacheDirectory : downloadDirectory;
+            ValidateCacheDirectory(downloadLocation);
             bool exists;
 
             if (TryGetFileNameFromUrl(uri, out var fileName))
             {
-                filePath = Path.Combine(DownloadCacheDirectory, fileName);
+                filePath = Path.Combine(downloadLocation, fileName);
                 exists = File.Exists(filePath);
             }
             else
             {
-                filePath = Path.Combine(DownloadCacheDirectory, GenerateGuid(uri).ToString());
+                filePath = Path.Combine(downloadLocation, GenerateGuid(uri).ToString());
                 exists = File.Exists(filePath);
             }
 
             if (exists)
             {
+                if (forceDownload)
+                {
+                    return !TryDeleteCacheItem(uri, downloadDirectory);
+                }
+#if UNITY_STANDALONE || UNITY_WSA || UNITY_EDITOR_WIN
+                filePath = $"{Path.GetFullPath(filePath)}";
+#else
                 filePath = $"file://{Path.GetFullPath(filePath)}";
+#endif
             }
 
             return exists;
@@ -259,9 +340,9 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// </summary>
         /// <param name="uri">The uri key of the item.</param>
         /// <returns>True, if the cached item was successfully deleted.</returns>
-        public static bool TryDeleteCacheItem(string uri)
+        public static bool TryDeleteCacheItem(string uri, string downloadDirectory = "")
         {
-            if (!TryGetDownloadCacheItem(uri, out var filePath))
+            if (!TryGetDownloadCacheItem(uri, out var filePath, downloadDirectory))
             {
                 return false;
             }
@@ -272,7 +353,7 @@ namespace RealityCollective.Utilities.WebRequestRest
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                Debug.LogError(GenerateErrorRequest("Delete file", uri, e));
             }
 
             return !File.Exists(filePath);
@@ -303,7 +384,7 @@ namespace RealityCollective.Utilities.WebRequestRest
             return Path.HasExtension(fileName);
         }
 
-        #endregion Download Cache
+#endregion Download Cache
 
         /// <summary>
         /// Download a <see cref="Texture2D"/> from the provided <see cref="url"/>.
@@ -315,6 +396,7 @@ namespace RealityCollective.Utilities.WebRequestRest
         public static async Task<Texture2D> DownloadTextureAsync(string url, string fileName = null, RestArgs downloadTextureArgs = default)
         {
             await Awaiters.UnityMainThread;
+            var downloadLocation = string.IsNullOrEmpty(downloadTextureArgs.DownloadLocation) ? DownloadLocation : downloadTextureArgs.DownloadLocation;
 
             bool isCached;
             string cachePath;
@@ -331,7 +413,7 @@ namespace RealityCollective.Utilities.WebRequestRest
             }
             else
             {
-                isCached = TryGetDownloadCacheItem(fileName, out cachePath);
+                isCached = TryGetDownloadCacheItem(fileName, out cachePath, downloadLocation, ForceDownload || downloadTextureArgs.ForceDownload);
             }
 
             using var webRequest = UnityWebRequestTexture.GetTexture(url);
@@ -345,8 +427,7 @@ namespace RealityCollective.Utilities.WebRequestRest
 
             var downloadHandler = (DownloadHandlerTexture)webRequest.downloadHandler;
 
-            if (downloadTextureArgs.ForceDownload || (!isCached &&
-                !File.Exists(cachePath)))
+            if (!isCached && !File.Exists(cachePath))
             {
                 try
                 {
@@ -355,7 +436,7 @@ namespace RealityCollective.Utilities.WebRequestRest
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"Failed to write texture to disk!\n{e}");
+                    Debug.LogError(GenerateErrorMessage("texture", url, e));
                 }
             }
 
@@ -373,6 +454,7 @@ namespace RealityCollective.Utilities.WebRequestRest
         public static async Task<AudioClip> DownloadAudioClipAsync(string url, AudioType audioType, string fileName = "", RestArgs downloadAudioClipArgs = default)
         {
             await Awaiters.UnityMainThread;
+            var downloadLocation = string.IsNullOrEmpty(downloadAudioClipArgs.DownloadLocation) ? DownloadLocation : downloadAudioClipArgs.DownloadLocation;
 
             if (string.IsNullOrWhiteSpace(fileName))
             {
@@ -389,7 +471,7 @@ namespace RealityCollective.Utilities.WebRequestRest
             }
             else
             {
-                isCached = TryGetDownloadCacheItem(fileName, out cachePath);
+                isCached = TryGetDownloadCacheItem(fileName, out cachePath, downloadLocation, ForceDownload || downloadAudioClipArgs.ForceDownload);
             }
 
             if (isCached)
@@ -408,8 +490,7 @@ namespace RealityCollective.Utilities.WebRequestRest
 
             var downloadHandler = (DownloadHandlerAudioClip)webRequest.downloadHandler;
 
-            if (downloadAudioClipArgs.ForceDownload || (!isCached &&
-                !File.Exists(cachePath)))
+            if (!isCached && !File.Exists(cachePath))
             {
                 try
                 {
@@ -418,7 +499,7 @@ namespace RealityCollective.Utilities.WebRequestRest
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"Failed to write audio asset to disk! {e}");
+                    Debug.LogError(GenerateErrorMessage("audio clip", url, e));
                 }
             }
 
@@ -494,7 +575,7 @@ namespace RealityCollective.Utilities.WebRequestRest
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError(e);
+                    Debug.LogError(GenerateErrorRequest("Asset bundle download", url, e));
                     throw;
                 }
 
@@ -519,13 +600,14 @@ namespace RealityCollective.Utilities.WebRequestRest
         public static async Task<string> DownloadFileAsync(string url, string fileName = null, RestArgs downloadFileArgs = default)
         {
             await Awaiters.UnityMainThread;
+            var downloadLocation = string.IsNullOrEmpty(downloadFileArgs.DownloadLocation) ? DownloadLocation : downloadFileArgs.DownloadLocation;
 
             if (string.IsNullOrWhiteSpace(fileName))
             {
                 TryGetFileNameFromUrl(url, out fileName);
             }
 
-            if (TryGetDownloadCacheItem(fileName, out var filePath) && !downloadFileArgs.ForceDownload)
+            if (TryGetDownloadCacheItem(fileName, out var filePath, downloadLocation, ForceDownload || downloadFileArgs.ForceDownload))
             {
                 return filePath;
             }
@@ -537,11 +619,18 @@ namespace RealityCollective.Utilities.WebRequestRest
             };
 
             webRequest.downloadHandler = fileDownloadHandler;
-            var response = await ProcessRequestAsync(webRequest, downloadFileArgs);
-
-            if (!response.Successful)
+            try
             {
-                Debug.LogError(GenerateErrorMessage("file", url, response));
+                var response = await ProcessRequestAsync(webRequest, downloadFileArgs);
+                if (!response.Successful)
+                {
+                    Debug.LogError(GenerateErrorMessage("file", url, response));
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(GenerateErrorMessage("file", url, ex));
                 return null;
             }
 
@@ -560,13 +649,14 @@ namespace RealityCollective.Utilities.WebRequestRest
         {
             byte[] bytes = null;
             await Awaiters.UnityMainThread;
+            var downloadLocation = string.IsNullOrEmpty(downloadFileArgs.DownloadLocation) ? DownloadLocation : downloadFileArgs.DownloadLocation;
 
             if (string.IsNullOrWhiteSpace(fileName))
             {
                 TryGetFileNameFromUrl(url, out fileName);
             }
 
-            if (!TryGetDownloadCacheItem(fileName, out var filePath) || downloadFileArgs.ForceDownload)
+            if (!TryGetDownloadCacheItem(fileName, out var filePath, downloadLocation))
             {
                 filePath = await DownloadFileAsync(url, fileName, downloadFileArgs);
             }
@@ -598,13 +688,14 @@ namespace RealityCollective.Utilities.WebRequestRest
         {
             string fileContents = null;
             await Awaiters.UnityMainThread;
+            var downloadLocation = string.IsNullOrEmpty(downloadFileArgs.DownloadLocation) ? DownloadLocation : downloadFileArgs.DownloadLocation;
 
             if (string.IsNullOrWhiteSpace(fileName))
             {
                 TryGetFileNameFromUrl(url, out fileName);
             }
 
-            if (!TryGetDownloadCacheItem(fileName, out string filePath) || downloadFileArgs.ForceDownload)
+            if (!TryGetDownloadCacheItem(fileName, out string filePath, downloadLocation))
             {
                 filePath = await DownloadFileAsync(url, fileName, downloadFileArgs);
             }
@@ -625,7 +716,7 @@ namespace RealityCollective.Utilities.WebRequestRest
             return fileContents;
         }
 
-        #endregion Get Multimedia Content
+#endregion Get Multimedia Content
 
         #region Private Functions
 
@@ -633,11 +724,22 @@ namespace RealityCollective.Utilities.WebRequestRest
         {
             await Awaiters.UnityMainThread;
 
-            if (processArgs.Timeout > 0)
+            var timeout = Timeout + processArgs.Timeout;
+            if (timeout > 0)
             {
-                webRequest.timeout = processArgs.Timeout;
+                webRequest.timeout = timeout;
             }
 
+            // Use defaults
+            if (Headers.Count > 0)
+            {
+                foreach (var header in Headers)
+                {
+                    webRequest.SetRequestHeader(header.Key, header.Value);
+                }
+            }
+
+            // Apply overrides if supplied
             if (processArgs.Headers != null)
             {
                 foreach (var header in processArgs.Headers)
@@ -666,7 +768,7 @@ namespace RealityCollective.Utilities.WebRequestRest
 
             Thread backgroundThread = null;
 
-            if (processArgs.Progress != null)
+            if (Progress != null || processArgs.Progress != null)
             {
                 async void ProgressReportingThread()
                 {
@@ -676,9 +778,12 @@ namespace RealityCollective.Utilities.WebRequestRest
 
                         while (!webRequest.isDone)
                         {
-                            processArgs.Progress.Report(isUpload ? webRequest.uploadProgress : webRequest.downloadProgress * 100f);
+                            // Update default progress if set
+                            Progress?.Report(isUpload ? webRequest.uploadProgress : webRequest.downloadProgress * 100f);
 
-                            if (processArgs.CancellationToken.IsCancellationRequested)
+                            processArgs.Progress?.Report(isUpload ? webRequest.uploadProgress : webRequest.downloadProgress * 100f);
+
+                            if (CancellationToken.IsCancellationRequested || processArgs.CancellationToken.IsCancellationRequested)
                             {
                                 webRequest.Abort();
                             }
@@ -702,6 +807,13 @@ namespace RealityCollective.Utilities.WebRequestRest
 
             try
             {
+                // Use defaults
+                if (CertificateHandler != null)
+                {
+                    webRequest.certificateHandler = CertificateHandler;
+                    webRequest.disposeCertificateHandlerOnDispose = DisposeCertificateHandlerOnDispose;
+                }
+                // Apply overrides if supplied
                 if (processArgs.CertificateHandler != null)
                 {
                     webRequest.certificateHandler = processArgs.CertificateHandler;
@@ -715,6 +827,7 @@ namespace RealityCollective.Utilities.WebRequestRest
             }
 
             backgroundThread?.Join();
+            Progress?.Report(100f);
             processArgs.Progress?.Report(100f);
 
             if (webRequest.result ==
@@ -740,7 +853,7 @@ namespace RealityCollective.Utilities.WebRequestRest
                 return new Response(false, webRequest.downloadHandler.error, webRequest.downloadHandler.data, webRequest.responseCode);
             }
 
-            if (processArgs.ReadResponseData)
+            if (ReadResponseData || processArgs.ReadResponseData)
             {
                 return new Response(true, webRequest.downloadHandler?.text, webRequest.downloadHandler?.data, webRequest.responseCode);
             }
@@ -768,6 +881,11 @@ namespace RealityCollective.Utilities.WebRequestRest
         private static string GenerateErrorMessage(string typeName, string url, Exception exception)
         {
             return $"Failed to download {typeName} from \"{url}\"!\n{exception.Message}\n{exception.StackTrace}";
+        }
+
+        private static string GenerateErrorRequest(string requestName, string url, Exception exception)
+        {
+            return $"A failure occured in a {requestName} call targetting \"{url}\"!\n{exception.Message}\n{exception.StackTrace}";
         }
         #endregion Private Functions
     }

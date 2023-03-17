@@ -42,5 +42,10 @@ namespace RealityCollective.Utilities.WebRequestRest
             ResponseData = responseData;
             ResponseCode = responseCode;
         }
+
+        /// <summary>
+        /// Failure response type
+        /// </summary>
+        public static Response Failure => new Response(false, "", null, -1);
     }
 }
