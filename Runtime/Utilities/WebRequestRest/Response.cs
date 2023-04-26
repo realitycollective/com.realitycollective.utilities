@@ -46,6 +46,6 @@ namespace RealityCollective.Utilities.WebRequestRest
         /// <summary>
         /// Failure response type
         /// </summary>
-        public static Response Failure => new Response(false, "", null, -1);
+        public static Response Failure => new Response(false, string.Empty, null, -1);
     }
 }
