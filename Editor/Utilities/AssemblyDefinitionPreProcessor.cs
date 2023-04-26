@@ -1,4 +1,4 @@
-﻿// Copyright (c) XRTK. All rights reserved.
+﻿// Copyright (c) Reality Collective. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
@@ -60,7 +60,7 @@ namespace RealityCollective.Editor.Utilities
                     var directory = Path.GetDirectoryName(assembly);
                     var assemblyInfoPath = $"{directory}/AssemblyInfo.cs";
                     var fileText = !File.Exists(assemblyInfoPath)
-                        ? $@"// Copyright (c) XRTK. All rights reserved.
+                        ? $@"// Copyright (c) Reality Collective. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System.Reflection;
