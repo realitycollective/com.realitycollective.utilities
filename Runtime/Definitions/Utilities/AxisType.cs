@@ -18,27 +18,27 @@ namespace RealityCollective.Definitions.Utilities
         /// </summary>
         Raw,
         /// <summary>
-        /// Digital On/Off input.
+        /// Digital On/Off UnityEngine.Input.
         /// </summary>
         Digital,
         /// <summary>
-        /// Single Axis analogue input.
+        /// Single Axis analogue UnityEngine.Input.
         /// </summary>
         SingleAxis,
         /// <summary>
-        /// Dual Axis analogue input.
+        /// Dual Axis analogue UnityEngine.Input.
         /// </summary>
         DualAxis,
         /// <summary>
-        /// Position only Axis analogue input.
+        /// Position only Axis analogue UnityEngine.Input.
         /// </summary>
         ThreeDofPosition,
         /// <summary>
-        /// Rotation only Axis analogue input.
+        /// Rotation only Axis analogue UnityEngine.Input.
         /// </summary>
         ThreeDofRotation,
         /// <summary>
-        /// Position AND Rotation analogue input.
+        /// Position AND Rotation analogue UnityEngine.Input.
         /// </summary>
         SixDof
     }

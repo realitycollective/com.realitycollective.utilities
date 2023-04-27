@@ -10,6 +10,7 @@ namespace RealityCollective.Utilities.WebRequestRest
 {
     public struct RestArgs
     {
+        public string DownloadLocation;
         public Dictionary<string, string> Headers;
         public IProgress<float> Progress;
         public int Timeout;
