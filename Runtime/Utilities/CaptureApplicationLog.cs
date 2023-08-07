@@ -11,7 +11,7 @@ namespace RealityCollective.Utilities
     /// </summary>
     public class CaptureApplicationLog : MonoBehaviour
     {
-        void Awake()
+        private void Awake()
         {
             Application.logMessageReceived += Log;
         }

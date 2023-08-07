@@ -63,13 +63,13 @@ namespace RealityCollective.Utilities
         /// </summary>
         /// <param name="message">The log message to write.</param>
         /// <param name="logType">The type of log to report, message, warning or error.</param>
-        /// <param name="AppLog">Is the log event already in the Unity debugger, if so, skip recording it and just add it to the text log.</param>
+        /// <param name="appLog">Is the log event already in the Unity debugger, if so, skip recording it and just add it to the text log.</param>
         /// <param name="includeStackTrace">Should a stack trace also be generated when logging.</param>
-        public static void Log(string message, LogType logType = LogType.Log, bool AppLog = false, bool includeStackTrace = true)
+        public static void Log(string message, LogType logType = LogType.Log, bool appLog = false, bool includeStackTrace = true)
         {
             if (!pauseLog)
             {
-                if (!AppLog)
+                if (!appLog)
                 {
                     Console.WriteLine(message);
                     if (DebugMode)
