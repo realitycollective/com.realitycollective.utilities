@@ -51,5 +51,21 @@ namespace RealityCollective.Editor.Utilities
 
             return filesPaths;
         }
+
+        /// <summary>
+        /// Utility to return all recognized files, including meta files within a specific path
+        /// </summary>
+        /// <param name="assetsRootPath">Root folder from which to search from</param>
+        public static List<string> GetAllFilesAtPath(string assetsRootPath)
+        {
+            // Get list of working files
+            var filesPaths = new List<string>();
+
+            assetsRootPath = Path.GetFullPath(assetsRootPath);
+
+            filesPaths.AddRange(Directory.GetFiles(assetsRootPath, "*.*", SearchOption.AllDirectories));
+
+            return filesPaths;
+        }
     }
 }
