@@ -87,8 +87,12 @@ namespace RealityCollective.Utilities.Async
         public static SimpleCoroutineAwaiter GetAwaiter(this WaitWhile instruction)
             => GetAwaiterReturnVoid(instruction);
 
+#if !UNITY_2023_1_OR_NEWER
+
         public static SimpleCoroutineAwaiter<AsyncOperation> GetAwaiter(this AsyncOperation instruction)
             => GetAwaiterReturnSelf(instruction);
+
+#endif
 
         public static SimpleCoroutineAwaiter<Object> GetAwaiter(this ResourceRequest instruction)
         {
