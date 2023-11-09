@@ -61,7 +61,7 @@ namespace RealityCollective.Editor.Utilities
 
             for (int i = 0; i < assetsRootPath.Count; i++)
             {
-                filesPaths.AddRange(UnityFileHelper.GetUnityAssetsAtPath(assetsRootPath[i]));
+                filesPaths.AddRange(UnityFileHelper.GetAllFilesAtPath(assetsRootPath[i]));
             }
 
             // Create dictionary to hold old-to-new GUID map
