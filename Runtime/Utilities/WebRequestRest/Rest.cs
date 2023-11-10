@@ -528,7 +528,7 @@ namespace RealityCollective.Utilities.WebRequestRest
                 TryGetFileNameFromUrl(url, out fileName);
             }
 
-            bool isCached;
+            bool isCached = false;
             string cachePath;
 
             if (url.Contains("file://"))
