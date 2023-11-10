@@ -242,6 +242,34 @@ namespace RealityCollective.Utilities.Tests.Extensions
                 Assert.IsNotNull(response, "No result returned from File request");
             });
         }
+
+        [Test]
+        public async void Test_05_03_DownloadAudio()
+        {
+            string fileUrl = "https://freetestdata.com/wp-content/uploads/2021/09/Free_Test_Data_100KB_MP3.mp3";
+
+            await Rest.DownloadAudioClipAsync(fileUrl, AudioType.MPEG).ContinueWith(async (response) =>
+            {
+                await Awaiters.UnityMainThread;
+                Assert.IsNotNull(response.Result, "No audio clip from File request");
+            });
+        }
+        
+        [Test]
+        public async void Test_05_04_StreamAudio()
+        {
+            string fileUrl = "https://freetestdata.com/wp-content/uploads/2021/09/Free_Test_Data_500KB_MP3.mp3";
+
+            await Rest.StreamAudioAsync(fileUrl, AudioType.MPEG,clip =>
+            {
+                Assert.IsNotNull(clip, "No audio clip from stream");
+
+            }).ContinueWith( async response =>
+            {
+                await Awaiters.UnityMainThread;
+                Assert.IsNotNull(response.Result, "No audio clip from File request");
+            });
+        }
         #endregion Download Handlers
 
     }

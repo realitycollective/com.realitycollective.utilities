@@ -505,6 +505,105 @@ namespace RealityCollective.Utilities.WebRequestRest
 
             return downloadHandler.audioClip;
         }
+        
+        /// <summary>
+        /// Download a <see cref="AudioClip"/> from the provided <see cref="url"/>.
+        /// </summary>
+        /// <param name="url">The url to download the <see cref="AudioClip"/> from.</param>
+        /// <param name="audioType"><see cref="AudioType"/> to download.</param>
+        /// <param name="onStreamPlaybackReady"><see cref="Action{T}"/> callback raised when stream is ready to be played.</param>
+        /// <param name="fileName">Optional, file name to download (including extension).</param>
+        /// <param name="playbackAmountThreshold">Optional, the amount of data to to download before signaling that streaming is ready.</param>
+        /// <param name="streamAudioClipArgs">Optional, <see cref="RestParameters"/>.</param>
+        /// <returns>Raw downloaded bytes from the stream.</returns>
+        public static async Task<AudioClip> StreamAudioAsync(string url, AudioType audioType, Action<AudioClip> onStreamPlaybackReady, string fileName = null, float playbackAmountThreshold = 10, RestArgs streamAudioClipArgs = default)
+        {
+            await Awaiters.UnityMainThread;
+            var downloadLocation = string.IsNullOrEmpty(streamAudioClipArgs.DownloadLocation) ? DownloadLocation : streamAudioClipArgs.DownloadLocation;
+            AudioClip audioClip = null;
+            var streamStarted = false;
+
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                TryGetFileNameFromUrl(url, out fileName);
+            }
+
+            bool isCached = false;
+            string cachePath;
+
+            if (url.Contains("file://"))
+            {
+                isCached = true;
+                cachePath = url;
+            }
+            else
+            {
+                isCached = TryGetDownloadCacheItem(fileName, out cachePath, downloadLocation, ForceDownload || streamAudioClipArgs.ForceDownload);
+            }
+
+            if (isCached)
+            {
+                url = cachePath;
+            }
+
+            using var webRequest = UnityWebRequestMultimedia.GetAudioClip(url, audioType);
+            var downloadHandler = (DownloadHandlerAudioClip)webRequest.downloadHandler;
+            downloadHandler.streamAudio = true;
+            Progress = new Progress<float>(report =>
+            {
+                try
+                {
+                    if (downloadHandler.audioClip == null)
+                    {
+                        return;
+                    }
+                    
+                    if (report > playbackAmountThreshold || downloadHandler.isDone)
+                    {
+                        var tempClip = downloadHandler.audioClip;
+                        audioClip = tempClip;
+                        audioClip.name = Path.GetFileNameWithoutExtension(fileName);
+                        streamStarted = true;
+                        onStreamPlaybackReady?.Invoke(audioClip);
+                    }
+                }
+                catch (Exception)
+                {
+                    // Ignored
+                }
+            });
+            var response = await ProcessRequestAsync(webRequest, streamAudioClipArgs);
+
+            if (!response.Successful)
+            {
+                Debug.LogError(GenerateErrorMessage("audio clip", url, response));
+                return null;
+            }
+
+
+            if (!isCached && !File.Exists(cachePath))
+            {
+                try
+                {
+                    using var fileStream = File.OpenWrite(cachePath);
+                    await fileStream.WriteAsync(downloadHandler.data, 0, downloadHandler.data.Length, CancellationToken.None);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(GenerateErrorMessage("audio clip", url, e));
+                }
+            }
+            audioClip = downloadHandler.audioClip;
+
+            if (!streamStarted)
+            {
+                streamStarted = true;
+                onStreamPlaybackReady?.Invoke(audioClip);
+            }
+            
+            return audioClip;
+        }
+
 
         /// <summary>
         /// Download a <see cref="AssetBundle"/> from the provided <see cref="url"/>.
