@@ -22,6 +22,7 @@ namespace RealityCollective.Utilities.WebRequestRest
     public static class Rest
     {
         #region Global Properties
+        public const string FileUriPrefix = "file://";
         public static string DownloadLocation = Application.temporaryCachePath;
         public static Dictionary<string, string> Headers = new Dictionary<string, string>();
         public static IProgress<float> Progress = null;
@@ -325,11 +326,8 @@ namespace RealityCollective.Utilities.WebRequestRest
                 {
                     return !TryDeleteCacheItem(uri, downloadDirectory);
                 }
-#if UNITY_STANDALONE || UNITY_WSA || UNITY_EDITOR_WIN
-                filePath = $"{Path.GetFullPath(filePath)}";
-#else
-                filePath = $"file://{Path.GetFullPath(filePath)}";
-#endif
+
+                filePath = $"{Rest.FileUriPrefix}{Path.GetFullPath(filePath)}";
             }
 
             return exists;
@@ -384,7 +382,7 @@ namespace RealityCollective.Utilities.WebRequestRest
             return Path.HasExtension(fileName);
         }
 
-#endregion Download Cache
+        #endregion Download Cache
 
         /// <summary>
         /// Download a <see cref="Texture2D"/> from the provided <see cref="url"/>.
@@ -414,6 +412,11 @@ namespace RealityCollective.Utilities.WebRequestRest
             else
             {
                 isCached = TryGetDownloadCacheItem(fileName, out cachePath, downloadLocation, ForceDownload || downloadTextureArgs.ForceDownload);
+            }
+
+            if (isCached)
+            {
+                url = cachePath;
             }
 
             using var webRequest = UnityWebRequestTexture.GetTexture(url);
@@ -661,13 +664,16 @@ namespace RealityCollective.Utilities.WebRequestRest
                 filePath = await DownloadFileAsync(url, fileName, downloadFileArgs);
             }
 
+            // Strip the file:// prefix for local storage access
+            filePath = filePath.Replace(Rest.FileUriPrefix, "");
+
             if (File.Exists(filePath))
             {
                 try
                 {
                     bytes = File.ReadAllBytes(filePath);
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
                 {
                     Debug.LogError(GenerateErrorMessage("File as Bytes", url, ex));
                 }
@@ -716,7 +722,7 @@ namespace RealityCollective.Utilities.WebRequestRest
             return fileContents;
         }
 
-#endregion Get Multimedia Content
+        #endregion Get Multimedia Content
 
         #region Private Functions
 
