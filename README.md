@@ -11,7 +11,6 @@ A collection of useful utilities for Unity Projects by the Reality Collective.  
 
 ### Utilities
 
-* Rest - A collection of Rest based tools to make making and using Rest calls in Unity very easy.
 * Async - A collection of Asynchronous and CoRoutine helpers for working with Sync -> Async code.
 
 ### Extensions
