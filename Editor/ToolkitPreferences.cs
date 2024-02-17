@@ -8,7 +8,7 @@ namespace RealityCollective.Utilities.Editor
 {
     public static class ToolkitPreferences
     {
-        public const string Editor_Menu_Keyword = "Reality Collective";
+        public const string Editor_Menu_Keyword = "Tools/Reality Toolkit";
 
         #region Debug Symbolic Links
 
