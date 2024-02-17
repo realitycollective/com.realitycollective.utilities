@@ -8,8 +8,6 @@ namespace RealityCollective.Utilities.Editor
 {
     public static class ToolkitPreferences
     {
-        public const string Editor_Menu_Keyword = "Tools/Reality Toolkit";
-
         #region Debug Symbolic Links
 
         //private static readonly GUIContent DebugSymbolicContent = new GUIContent("Debug symbolic linking", "Enable or disable the debug information for symbolic linking.\n\nThis setting only applies to the currently running project.");
