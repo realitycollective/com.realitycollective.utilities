@@ -5,7 +5,6 @@ using RealityCollective.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using Debug = UnityEngine.Debug;
 
 namespace RealityCollective.Extensions
@@ -130,16 +129,19 @@ namespace RealityCollective.Extensions
         }
 
         /// <summary>
-        /// Attempts to resolve the type using a the <see cref="System.Type.AssemblyQualifiedName"/> or <see cref="Type.GUID"/> as <see cref="string"/>.
+        /// Attempts to resolve the type using a the <see cref="Type.AssemblyQualifiedName"/> or <see cref="Type.GUID"/> as <see cref="string"/>.
         /// </summary>
-        /// <param name="typeRef">The <see cref="Type.GUID"/> or <see cref="System.Type.AssemblyQualifiedName"/> as <see cref="string"/>.</param>
+        /// <param name="typeRef">The <see cref="Type.GUID"/> or <see cref="Type.AssemblyQualifiedName"/> as <see cref="string"/>.</param>
         /// <param name="resolvedType">The resolved <see cref="Type"/>.</param>
         /// <returns>True if the <see cref="resolvedType"/> was successfully obtained from or added to the <see cref="TypeCache"/>, otherwise false.</returns>
         public static bool TryResolveType(string typeRef, out Type resolvedType)
         {
             resolvedType = null;
 
-            if (string.IsNullOrEmpty(typeRef)) { return false; }
+            if (string.IsNullOrEmpty(typeRef))
+            {
+                return false;
+            }
 
             if (Guid.TryParse(typeRef, out var guid))
             {
@@ -147,22 +149,7 @@ namespace RealityCollective.Extensions
             }
 
             resolvedType = Type.GetType(typeRef);
-
-            if (resolvedType != null)
-            {
-                if (resolvedType.GUID != Guid.Empty)
-                {
-                    return TryResolveType(guid, out resolvedType);
-                }
-
-                if (!resolvedType.IsAbstract)
-                {
-                    Debug.LogWarning($"{resolvedType.Name} is missing a {nameof(GuidAttribute)}. This extension has been upgraded to use System.Type.GUID instead of System.Type.AssemblyQualifiedName");
-                    return true;
-                }
-            }
-
-            return false;
+            return resolvedType != null && !resolvedType.IsAbstract;
         }
 
         /// <summary>
