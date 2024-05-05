@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace RealityCollective.Editor.Utilities
 {
-    internal class AssemblyDefinitionPreProcessor : AssetPostprocessor
+    internal class AssemblyDefinitionPostprocessor : AssetPostprocessor
     {
         [Serializable]
         private class PackageInfo
