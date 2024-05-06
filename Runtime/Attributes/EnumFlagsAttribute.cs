@@ -4,7 +4,7 @@
 using System;
 using UnityEngine;
 
-namespace RealityCollective.Attributes
+namespace RealityCollective.Utilities.Attributes
 {
     /// <summary>
     /// From https://answers.unity.com/questions/486694/default-editor-enum-as-flags-.html

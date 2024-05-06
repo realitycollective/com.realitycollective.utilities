@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace RealityCollective.Extensions
+namespace RealityCollective.Utilities.Extensions
 {
     /// <summary>
     /// Extension methods for the Unity's Camera class

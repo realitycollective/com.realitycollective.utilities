@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Reality Collective. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using RealityCollective.Utilities.Definitions;
 using System.Collections.Generic;
-using RealityCollective.Definitions.Utilities;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace RealityCollective.Extensions
+namespace RealityCollective.Utilities.Extensions
 {
     /// <summary>
     /// Extension methods for Unity's <see cref="Bounds"/>

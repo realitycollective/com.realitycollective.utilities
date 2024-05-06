@@ -6,7 +6,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace RealityCollective.Extensions
+namespace RealityCollective.Utilities.Extensions
 {
     /// <summary>
     /// Extensions methods for the Unity Component class.

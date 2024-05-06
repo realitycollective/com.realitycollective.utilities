@@ -5,7 +5,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace RealityCollective.Editor
+namespace RealityCollective.Utilities.Editor
 {
     /// <summary>
     /// Popup window to help facilitate fixing broken serialized <see cref="Type"/> references.
