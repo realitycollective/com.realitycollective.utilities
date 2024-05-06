@@ -1,12 +1,17 @@
 {
   "name": "com.realitycollective.utilities",
   "displayName": "RealityCollective.Utilities",
-  "description": "A collection of useful utilities for Unity Projects by the Reality Collective.",
+  "description": "A collection of useful utilities for Unity projects by the Reality Collective.",
+  "version": "1.0.11-pre.1",
+  "documentationUrl": "https://realitycollective.io",
+  "changelogUrl": "https://github.com/realitycollective/com.realitytoolkit.utilities/releases",
+  "licensesUrl": "https://github.com/realitycollective/com.realitycollective.utilities/blob/main/LICENSE.md",
   "keywords": [
     "Unity",
-    "Tools"
+    "Extensions",
+    "Tools",
+    "Utilities"
   ],
-  "version": "1.0.11-pre.1",
   "unity": "2020.3",
   "homepage": "https://realitycollective.io",
   "bugs": {
@@ -21,6 +26,9 @@
     "name": "Reality Collective",
     "email": "realitycollectivedev@gmail.com",
     "url": "https://github.com/realitycollective"
+  },
+  "publishConfig": {
+    "registry": "https://package.openupm.com"
   },
   "dependencies": {
     "com.unity.modules.unitywebrequest": "1.0.0",
