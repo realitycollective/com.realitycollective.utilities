@@ -2,7 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 #if UNITY_EDITOR || !UNITY_WSA
-using RealityCollective.Definitions.Utilities;
+using RealityCollective.Utilities.Definitions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

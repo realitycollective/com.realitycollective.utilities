@@ -4,7 +4,7 @@
 using System;
 using UnityEngine;
 
-namespace RealityCollective.Definitions.Utilities
+namespace RealityCollective.Utilities.Definitions
 {
     /// <summary>
     /// A copy of the <see cref="AnimatorControllerParameter"/> because that class is not Serializable and cannot be modified in the editor.

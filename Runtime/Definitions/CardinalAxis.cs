@@ -3,7 +3,7 @@
 
 using System;
 
-namespace RealityCollective.Definitions.Utilities
+namespace RealityCollective.Utilities.Definitions
 {
     /// <summary>
     /// Enum which describes cardinal axes
