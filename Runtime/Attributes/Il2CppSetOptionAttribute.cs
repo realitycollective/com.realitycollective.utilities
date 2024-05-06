@@ -1,14 +1,17 @@
-// Copyright (c) Reality Collective. All rights reserved.
+﻿// Copyright (c) Reality Collective. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
 
-namespace Unity.IL2CPP.CompilerServices
+namespace RealityCollective.Utilities.Attributes
 {
     /// <summary>
     /// The code generation options available for IL to C++ conversion.
     /// Enable or disabled these with caution.
     /// </summary>
+    /// <remarks>
+    /// <seealso cref="https://docs.unity3d.com/Manual/IL2CPP.html#EnablingRuntimeChecksUsingIl2CppSetOption"/>
+    /// </remarks>
     public enum Option
     {
         /// <summary>
@@ -62,6 +65,9 @@ namespace Unity.IL2CPP.CompilerServices
     ///         return tmp.ToString();
     ///     }
     /// </summary>
+    /// <remarks>
+    /// <seealso cref="https://docs.unity3d.com/Manual/IL2CPP.html#EnablingRuntimeChecksUsingIl2CppSetOption"/>
+    /// </remarks>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
     public class Il2CppSetOptionAttribute : Attribute
     {

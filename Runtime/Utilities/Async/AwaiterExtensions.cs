@@ -1,4 +1,4 @@
-// MIT License
+﻿// MIT License
 
 // Copyright(c) 2016 Modest Tree Media Inc
 
@@ -20,9 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using RealityCollective.Extensions;
 using RealityCollective.Utilities.Async.AwaitYieldInstructions;
 using RealityCollective.Utilities.Async.Internal;
+using RealityCollective.Utilities.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;

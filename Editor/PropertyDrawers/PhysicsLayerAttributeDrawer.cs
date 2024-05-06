@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Reality Collective. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using System.Collections.Generic;
-using RealityCollective.Attributes;
 using RealityCollective.Editor.Utilities;
+using RealityCollective.Utilities.Attributes;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 

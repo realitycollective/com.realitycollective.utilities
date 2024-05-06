@@ -3,7 +3,7 @@
 
 using RealityCollective.Definitions.Utilities;
 
-namespace RealityCollective.Extensions
+namespace RealityCollective.Utilities.Extensions
 {
     /// <summary>
     /// <see cref="HandednessExtensions"/> type method extensions.
