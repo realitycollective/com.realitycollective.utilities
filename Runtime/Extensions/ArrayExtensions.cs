@@ -3,7 +3,7 @@
 
 using System;
 
-namespace RealityCollective.Extensions
+namespace RealityCollective.Utilities.Extensions
 {
     /// <summary>
     /// <see cref="Array"/> type method extensions.

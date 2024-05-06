@@ -1,5 +1,7 @@
 # Reality Toolkit - utilities Platform Module
 
+![com.realitycollective.utilities](https://github.com/realitycollective/realitycollective.logo/blob/main/RealityCollective/RepoBanners/com.realitycollective.utilities.png?raw=true)
+
 A collection of useful utilities for Unity Projects by the Reality Collective.  Useful for any Unity Project to accelerate and code safely within Unity.
 
 [![openupm](https://img.shields.io/npm/v/com.realitycollective.utilities?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.realitycollective.utilities/)
@@ -28,13 +30,13 @@ A collection of useful utilities for Unity Projects by the Reality Collective.  
 * ComponentExtensions
 * ConverterExtensions
 * DoubleExtensions
-* EnumerableExtensions
 * EnumExtensions
+* EnumerableExtensions
 * FloatExtensions
 * GameObjectExtensions
-* HandednessExtensions
 * LayerExtensions
 * MathfExtensions
+* MatrixExtensions
 * ProcessExtensions
 * QuaternionExtensions
 * RayExtensions
@@ -43,41 +45,25 @@ A collection of useful utilities for Unity Projects by the Reality Collective.  
 * SystemNumericsExtensions
 * TextureExtensions
 * TransformExtensions
-* TypeExtensions
 * UnityObjectExtensions
 * VectorExtensions
-
-### Reusable definitions
-
-* AnimatorParameter
-* AutoStartBehavior
-* AxisType
-* CardinalAxis
-* CollationOrderType
-* FlattenMode
-* Handedness
-* OrientationType
-* PivotAxis
-* ProcessResult
-* QuaternionSmoothed
-* RecognitionConfidenceLevel
-* RenderPipeline
-* RotationConstraintType
-* ScaleStateType
-* SystemType
-* TypeGrouping
-* Vector3Smoothed
 
 ### Property Attributes
 
 * EnumFlagsAttribute
-* ExtendsAttribute
 * Il2CppSetOptionAttribute
 * ImplementsAttribute
 * PhysicsLayerAttribute
 * PrefabAttribute
-* SystemTypeAttribute
 * Vector3RangeAttribute
+
+### Functional Utilities
+
+The Utilities package includes a well-formed logging solution that is single instanced and can optionally connect to Unity log events, useful for tracking both application and Unity logs and dramatically reduces the default Unity logging.  Also includes options to set whether debug logs should be output.
+
+* StaticLogger - A single instance logging solution for capturing, saving and exposing logged events from both Unity and the Application.
+* CaptureApplicationLog - A static router to push Unity events direct from a Unity scene.
+* FilterLogType - A filtering definition to limit what logs are captured / exposed
 
 ## Requirements
 <!-- Fill in list of requirements here -->
