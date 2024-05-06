@@ -4,7 +4,7 @@
 using System;
 using UnityEngine;
 
-namespace RealityCollective.Attributes
+namespace RealityCollective.Utilities.Attributes
 {
     /// <summary>
     /// Attribute used to ensure that a GameObject inspector slot only accepts prefabs.

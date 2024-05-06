@@ -5,7 +5,7 @@ using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
-namespace RealityCollective.Extensions
+namespace RealityCollective.Utilities.Extensions
 {
     public static class ConverterExtensions
     {

@@ -2,7 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using NUnit.Framework;
-using RealityCollective.Extensions;
+using RealityCollective.Utilities.Extensions;
 using System;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;

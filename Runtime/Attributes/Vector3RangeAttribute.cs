@@ -4,7 +4,7 @@
 using System;
 using UnityEngine;
 
-namespace RealityCollective.Attributes
+namespace RealityCollective.Utilities.Attributes
 {
     /// <summary>
     /// Attribute used to make a float or int variable in a script be restricted to a specific range.

@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
 
-namespace RealityCollective.Extensions
+namespace RealityCollective.Utilities.Extensions
 {
     /// <summary>
     /// Extension methods for .Net Collection objects, e.g. Lists, Dictionaries, Arrays
@@ -143,7 +143,7 @@ namespace RealityCollective.Extensions
 
             return false;
         }
-        
+
         /// <summary>
         /// Validate if a list contains items from another collection and adds items if not found, essentially merging the lists.
         /// </summary>
@@ -170,7 +170,7 @@ namespace RealityCollective.Extensions
             {
                 list.EnsureListItem(item);
             }
-        }        
+        }
 
         /// <summary>
         /// Safely removes an item from a <see cref="List{T}"/> if it is found.
