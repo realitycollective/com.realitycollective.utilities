@@ -636,65 +636,6 @@ namespace RealityCollective.Extensions
         /// <summary>
         /// Method to get bounds from a single Collider
         /// </summary>
-        /// <param name="collider">Target collider</param>
-        /// <param name="boundsPoints">array reference that gets filled with points</param>
-        /// <param name="ignoreLayers">layerMask to simplify search</param>
-        public static void GetColliderBoundsPoints(Collider collider, List<Vector3> boundsPoints, LayerMask ignoreLayers, Transform relativeTo = null)
-        {
-            if (ignoreLayers == (1 << collider.gameObject.layer | ignoreLayers)) { return; }
-
-            if (collider is SphereCollider)
-            {
-                SphereCollider sc = collider as SphereCollider;
-                Bounds sphereBounds = new Bounds(sc.center, 2 * sc.radius * Vector3.one);
-                sphereBounds.GetFacePositions(sc.transform, ref corners);
-                InverseTransformPoints(ref corners, relativeTo);
-                boundsPoints.AddRange(corners);
-            }
-            else if (collider is BoxCollider)
-            {
-                BoxCollider bc = collider as BoxCollider;
-                Bounds boxBounds = new Bounds(bc.center, bc.size);
-                boxBounds.GetCornerPositions(bc.transform, ref corners);
-                InverseTransformPoints(ref corners, relativeTo);
-                boundsPoints.AddRange(corners);
-
-            }
-            else if (collider is MeshCollider)
-            {
-                MeshCollider mc = collider as MeshCollider;
-                Bounds meshBounds = mc.sharedMesh.bounds;
-                meshBounds.GetCornerPositions(mc.transform, ref corners);
-                InverseTransformPoints(ref corners, relativeTo);
-                boundsPoints.AddRange(corners);
-            }
-            else if (collider is CapsuleCollider)
-            {
-                CapsuleCollider cc = collider as CapsuleCollider;
-                Bounds capsuleBounds = new Bounds(cc.center, Vector3.zero);
-                switch (cc.direction)
-                {
-                    case CAPSULE_X_AXIS:
-                        capsuleBounds.size = new Vector3(cc.height, cc.radius * 2, cc.radius * 2);
-                        break;
-
-                    case CAPSULE_Y_AXIS:
-                        capsuleBounds.size = new Vector3(cc.radius * 2, cc.height, cc.radius * 2);
-                        break;
-
-                    case CAPSULE_Z_AXIS:
-                        capsuleBounds.size = new Vector3(cc.radius * 2, cc.radius * 2, cc.height);
-                        break;
-                }
-                capsuleBounds.GetFacePositions(cc.transform, ref corners);
-                InverseTransformPoints(ref corners, relativeTo);
-                boundsPoints.AddRange(corners);
-            }
-        }
-
-        /// <summary>
-        /// Method to get bounds from a single Collider
-        /// </summary>
         /// <param name="target">gameObject that bounding box bounds</param>
         /// <param name="boundsPoints">array reference that gets filled with points</param>
         /// <param name="ignoreLayers">layerMask to simplify search</param>
@@ -988,19 +929,19 @@ namespace RealityCollective.Extensions
             containsCanvas = false;
 
             // Iterate transforms and collect bound volumes
-            foreach (Renderer childTransform in target.GetComponentsInChildren<Renderer>(includeInactiveObjects))
+            foreach (Renderer childRenderer in target.GetComponentsInChildren<Renderer>(includeInactiveObjects))
             {
                 // Reject if child of exclude 
                 if (exclude != null)
                 {
-                    if (childTransform.transform.IsChildOf(exclude)) { continue; }
+                    if (childRenderer.transform.IsChildOf(exclude)) { continue; }
                 }
 
 
-                containsCanvas |= childTransform is RectTransform;
+                containsCanvas |= childRenderer.transform is RectTransform;
                 if (containsCanvas && abortOnCanvas) { break; }
 
-                ExtractBoundsCorners(childTransform.transform, boundsCalculationMethod);
+                ExtractBoundsCorners(childRenderer.transform, boundsCalculationMethod);
             }
 
             if (totalBoundsCorners.Count == 0)
