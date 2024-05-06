@@ -5,7 +5,7 @@ using RealityCollective.Utilities.Attributes;
 using UnityEditor;
 using UnityEngine;
 
-namespace RealityCollective.Editor.PropertyDrawers
+namespace RealityCollective.Utilities.Editor
 {
     /// <summary>
     /// Custom property drawer for <see cref="PrefabAttribute"/> decorated <see cref="GameObject"/> values rendered in the inspector.

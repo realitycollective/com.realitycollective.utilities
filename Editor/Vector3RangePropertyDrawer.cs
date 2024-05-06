@@ -5,7 +5,7 @@ using RealityCollective.Utilities.Attributes;
 using UnityEditor;
 using UnityEngine;
 
-namespace RealityCollective.Editor.PropertyDrawers
+namespace RealityCollective.Utilities.Editor
 {
     /// <summary>
     /// Custom property drawer for <see cref="Vector3RangeAttribute"/> decorated <see cref="Vector3"/> values rendered in the inspector.

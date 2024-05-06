@@ -4,7 +4,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace RealityCollective.Editor.PropertyDrawers
+namespace RealityCollective.Utilities.Editor
 {
     /// <summary>
     /// Custom property drawer for <see cref="MinAttribute"/> decorated <see cref="float"/> or <see cref="int"/> values rendered in the inspector.

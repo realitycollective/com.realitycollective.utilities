@@ -5,7 +5,7 @@ using RealityCollective.Utilities.Attributes;
 using UnityEditor;
 using UnityEngine;
 
-namespace RealityCollective.Editor.PropertyDrawers
+namespace RealityCollective.Utilities.Editor
 {
     /// <summary>
     /// Renders enum flags on fields with the attribute.

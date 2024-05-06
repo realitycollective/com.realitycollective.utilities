@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Reality Collective. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using RealityCollective.Editor.Utilities;
 using RealityCollective.Utilities.Attributes;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace RealityCollective.Editor.PropertyDrawers
+namespace RealityCollective.Utilities.Editor
 {
     /// <summary>
     /// Renders the physics layer dropdown based on the current layers set in the Tag Manager.

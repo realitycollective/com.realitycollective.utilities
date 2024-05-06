@@ -6,7 +6,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace RealityCollective.Editor.Extensions
+namespace RealityCollective.Utilities.Editor
 {
     /// <summary>
     /// Extensions for <see cref="ScriptableObject"/>s
