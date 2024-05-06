@@ -1,4 +1,4 @@
-﻿// Copyright (c) XRTK. All rights reserved.
+﻿// Copyright (c) Reality Collective. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.﻿
 
 using System;
@@ -61,7 +61,7 @@ namespace RealityCollective.Editor.Utilities
 
             for (int i = 0; i < assetsRootPath.Count; i++)
             {
-                filesPaths.AddRange(UnityFileHelper.GetUnityAssetsAtPath(assetsRootPath[i]));
+                filesPaths.AddRange(UnityFileHelper.GetAllFilesAtPath(assetsRootPath[i]));
             }
 
             // Create dictionary to hold old-to-new GUID map

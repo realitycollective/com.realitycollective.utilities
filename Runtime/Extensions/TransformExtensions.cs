@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Reality Collective. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
@@ -469,6 +469,30 @@ namespace RealityCollective.Extensions
             // finally, actually perform the scale / translation
             target.localScale = newScale;
             target.localPosition = finalPosition;
+        }
+
+        /// <summary>
+        /// Destroy all children of the target Transform/GameObject
+        /// </summary>
+        /// <param name="target">The transform to destroy all children of</param>
+        /// <param name="immediate">Should the removal use the more destroctive 'Immediate' Method?</param>
+        public static void DestroyChildren(this Transform target, bool immediate = false)
+        {
+            if (target.childCount > 0)
+            {
+                foreach (Transform child in target)
+                {
+                    if (immediate)
+                    {
+                        GameObject.DestroyImmediate(child);
+                    }
+                    else
+                    {
+                        GameObject.Destroy(child);
+                    }
+                }
+            }
+
         }
     }
 }

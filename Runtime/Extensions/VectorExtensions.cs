@@ -1,10 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Reality Collective. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace RealityCollective.Extensions
 {
@@ -394,27 +393,6 @@ namespace RealityCollective.Extensions
             source.x = Random.Range(-radius, radius);
             source.y = Random.Range(-radius, radius);
             return source;
-        }
-
-        /// <summary>
-        /// Determine the move direction based off of the direction provided
-        /// </summary>
-        /// <param name="direction"></param>
-        /// <param name="deadZone"></param>
-        /// <returns></returns>
-        public static MoveDirection DetermineMoveDirection(this Vector2 direction, float deadZone = 0.6f)
-        {
-            if (direction.sqrMagnitude < deadZone * deadZone)
-            {
-                return MoveDirection.None;
-            }
-
-            if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
-            {
-                return direction.x > 0 ? MoveDirection.Right : MoveDirection.Left;
-            }
-
-            return direction.y > 0 ? MoveDirection.Up : MoveDirection.Down;
         }
 
         /// <summary>

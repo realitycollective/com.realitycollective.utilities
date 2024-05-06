@@ -1,4 +1,4 @@
-﻿// Copyright (c) XRTK. All rights reserved.
+﻿// Copyright (c) Reality Collective. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
@@ -44,12 +44,9 @@ namespace RealityCollective.Editor.Extensions
         /// <param name="unique">Is the new asset unique, or can we make copies?</param>
         public static T CreateAsset<T>(this T scriptableObject, string path, string fileName, bool ping, bool unique = true) where T : ScriptableObject
         {
-            if (string.IsNullOrEmpty(path))
-            {
-                throw new ArgumentNullException("You have not supplied the path to create the asset in");
-            }
-
             var name = string.IsNullOrEmpty(fileName) ? $"{scriptableObject.GetType().Name}" : fileName;
+
+            path ??= "Assets";
 
             name = name.Replace(" ", string.Empty);
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) XRTK. All rights reserved.
+﻿// Copyright (c) Reality Collective. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
@@ -48,6 +48,22 @@ namespace RealityCollective.Editor.Utilities
                     Debug.LogError($"{e}\n{assetsRootPath}");
                 }
             }
+
+            return filesPaths;
+        }
+
+        /// <summary>
+        /// Utility to return all recognized files, including meta files within a specific path
+        /// </summary>
+        /// <param name="assetsRootPath">Root folder from which to search from</param>
+        public static List<string> GetAllFilesAtPath(string assetsRootPath)
+        {
+            // Get list of working files
+            var filesPaths = new List<string>();
+
+            assetsRootPath = Path.GetFullPath(assetsRootPath);
+
+            filesPaths.AddRange(Directory.GetFiles(assetsRootPath, "*.*", SearchOption.AllDirectories));
 
             return filesPaths;
         }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Reality Collective. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace RealityCollective.Extensions
 {
@@ -152,11 +151,6 @@ namespace RealityCollective.Extensions
             foreach (var renderer in gameObject.GetComponentsInChildren<Renderer>())
             {
                 renderer.enabled = isActive;
-            }
-
-            foreach (var graphic in gameObject.GetComponentsInChildren<Graphic>())
-            {
-                graphic.enabled = isActive;
             }
 
             if (includeColliders)

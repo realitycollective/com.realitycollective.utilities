@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Reality Collective. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System.Collections.Generic;
@@ -90,10 +90,11 @@ namespace RealityCollective.Extensions
         #region Public Static Functions
 
         /// <summary>
-        /// Returns an instance of the 'Bounds' class which is invalid. An invalid 'Bounds' instance 
-        /// is one which has its size vector set to 'float.MaxValue' for all 3 components. The center
-        /// of an invalid bounds instance is the zero vector.
+        /// Returns an instance of the <see cref="Bounds"/> class which is invalid. 
+        /// An invalid <see cref="Bounds"/> instance is one which has its size vector set to 'float.MaxValue' for all 3 components.
+        /// The center of an invalid bounds instance is the zero vector.
         /// </summary>
+        /// <returns>Returns an instance of the <see cref="Bounds"/> class which is invalid.</returns>
         public static Bounds GetInvalidBoundsInstance()
         {
             return new Bounds(Vector3.zero, GetInvalidBoundsSize());
@@ -103,6 +104,7 @@ namespace RealityCollective.Extensions
         /// Checks if the specified bounds instance is valid. A valid 'Bounds' instance is
         /// one whose size vector does not have all 3 components set to 'float.MaxValue'.
         /// </summary>
+        /// <param name="bounds">The input bounding volume.</param>
         public static bool IsValid(this Bounds bounds)
         {
             return bounds.size != GetInvalidBoundsSize();
@@ -111,9 +113,9 @@ namespace RealityCollective.Extensions
         /// <summary>
         /// Gets all the corner points of the bounds in world space.
         /// </summary>
-        /// <param name="transform"></param>
-        /// <param name="positions"></param>
-        /// <param name="bounds"></param>
+        /// <param name="bounds">The input bounding volume.</param>
+        /// <param name="transform">A relative transform point.</param>
+        /// <param name="positions">A reference <see cref="Vector3"/> array of 8 points to populate.</param>
         public static void GetCornerPositionsWorldSpace(this Bounds bounds, Transform transform, ref Vector3[] positions)
         {
             // Calculate the local points to transform.
@@ -148,8 +150,8 @@ namespace RealityCollective.Extensions
         /// <summary>
         /// Gets all the corner points of the bounds in local space.
         /// </summary>
-        /// <param name="positions"></param>
-        /// <param name="bounds"></param>
+        /// <param name="bounds">The input bounding volume.</param>
+        /// <param name="positions">A reference <see cref="Vector3"/> array of 8 points to populate.</param>
         public static void GetCornerPositionsLocalSpace(this Bounds bounds, ref Vector3[] positions)
         {
             // Allocate the array if needed.
@@ -216,8 +218,8 @@ namespace RealityCollective.Extensions
         /// <summary>
         /// Gets all the corner points of the bounds.
         /// </summary>
-        /// <param name="bounds"></param>
-        /// <param name="positions"></param>
+        /// <param name="bounds">The input bounding volume.</param>
+        /// <param name="positions">A reference <see cref="Vector3"/> array of 8 points to populate.</param>
         /// <remarks>
         /// <see cref="Collider.bounds"/> is world space bounding volume.
         /// <see cref="Mesh.bounds"/> is local space bounding volume.
@@ -304,9 +306,9 @@ namespace RealityCollective.Extensions
         /// <summary>
         /// Gets all the corner points and mid points from Bounds
         /// </summary>
-        /// <param name="bounds"></param>
-        /// <param name="transform"></param>
-        /// <param name="positions"></param>
+        /// <param name="bounds">The input bounding volume.</param>
+        /// <param name="transform">A relative transform point.</param>
+        /// <param name="positions">A reference <see cref="Vector3"/> array of 8 points to populate.</param>
         public static void GetCornerAndMidPointPositions(this Bounds bounds, Transform transform, ref Vector3[] positions)
         {
             // Calculate the local points to transform.
@@ -355,10 +357,10 @@ namespace RealityCollective.Extensions
         /// <summary>
         /// Gets all the corner points and mid points from Bounds, ignoring the z axis
         /// </summary>
-        /// <param name="bounds"></param>
-        /// <param name="transform"></param>
-        /// <param name="positions"></param>
-        /// <param name="flattenAxis"></param>
+        /// <param name="bounds">The input bounding volume.</param>
+        /// <param name="transform">A relative transform point.</param>
+        /// <param name="positions">A reference <see cref="Vector3"/> array of 8 points to populate.</param>
+        /// <param name="flattenAxis">The <see cref="CardinalAxis"/> to flatten the points against.</param>
         public static void GetCornerAndMidPointPositions2D(this Bounds bounds, Transform transform, ref Vector3[] positions, CardinalAxis flattenAxis)
         {
             // Calculate the local points to transform.
@@ -632,7 +634,66 @@ namespace RealityCollective.Extensions
         }
 
         /// <summary>
-        /// GetRenderBoundsPoints gets bounding box points using Render method.
+        /// Method to get bounds from a single Collider
+        /// </summary>
+        /// <param name="collider">Target collider</param>
+        /// <param name="boundsPoints">array reference that gets filled with points</param>
+        /// <param name="ignoreLayers">layerMask to simplify search</param>
+        public static void GetColliderBoundsPoints(Collider collider, List<Vector3> boundsPoints, LayerMask ignoreLayers, Transform relativeTo = null)
+        {
+            if (ignoreLayers == (1 << collider.gameObject.layer | ignoreLayers)) { return; }
+
+            if (collider is SphereCollider)
+            {
+                SphereCollider sc = collider as SphereCollider;
+                Bounds sphereBounds = new Bounds(sc.center, 2 * sc.radius * Vector3.one);
+                sphereBounds.GetFacePositions(sc.transform, ref corners);
+                InverseTransformPoints(ref corners, relativeTo);
+                boundsPoints.AddRange(corners);
+            }
+            else if (collider is BoxCollider)
+            {
+                BoxCollider bc = collider as BoxCollider;
+                Bounds boxBounds = new Bounds(bc.center, bc.size);
+                boxBounds.GetCornerPositions(bc.transform, ref corners);
+                InverseTransformPoints(ref corners, relativeTo);
+                boundsPoints.AddRange(corners);
+
+            }
+            else if (collider is MeshCollider)
+            {
+                MeshCollider mc = collider as MeshCollider;
+                Bounds meshBounds = mc.sharedMesh.bounds;
+                meshBounds.GetCornerPositions(mc.transform, ref corners);
+                InverseTransformPoints(ref corners, relativeTo);
+                boundsPoints.AddRange(corners);
+            }
+            else if (collider is CapsuleCollider)
+            {
+                CapsuleCollider cc = collider as CapsuleCollider;
+                Bounds capsuleBounds = new Bounds(cc.center, Vector3.zero);
+                switch (cc.direction)
+                {
+                    case CAPSULE_X_AXIS:
+                        capsuleBounds.size = new Vector3(cc.height, cc.radius * 2, cc.radius * 2);
+                        break;
+
+                    case CAPSULE_Y_AXIS:
+                        capsuleBounds.size = new Vector3(cc.radius * 2, cc.height, cc.radius * 2);
+                        break;
+
+                    case CAPSULE_Z_AXIS:
+                        capsuleBounds.size = new Vector3(cc.radius * 2, cc.radius * 2, cc.height);
+                        break;
+                }
+                capsuleBounds.GetFacePositions(cc.transform, ref corners);
+                InverseTransformPoints(ref corners, relativeTo);
+                boundsPoints.AddRange(corners);
+            }
+        }
+
+        /// <summary>
+        /// Method to get bounds from a single Collider
         /// </summary>
         /// <param name="target">gameObject that bounding box bounds</param>
         /// <param name="boundsPoints">array reference that gets filled with points</param>
@@ -664,10 +725,10 @@ namespace RealityCollective.Extensions
         /// <summary>
         /// GetMeshFilterBoundsPoints - gets bounding box points using MeshFilter method.
         /// </summary>
-        /// <param name="target">gameObject that bounding box bounds</param>
-        /// <param name="boundsPoints">array reference that gets filled with points</param>
-        /// <param name="ignoreLayers">layerMask to simplify search</param>
-        /// <param name="meshFilters">The mesh filters to use for calculating the bounds of this gameObject</param>
+        /// <param name="target">gameObject that bounding box bounds.</param>
+        /// <param name="boundsPoints">array reference that gets filled with points.</param>
+        /// <param name="ignoreLayers">layerMask to simplify search.</param>
+        /// <param name="meshFilters">The mesh filters to use for calculating the bounds of this gameObject.</param>
         public static void GetMeshFilterBoundsPoints(GameObject target, ref List<Vector3> boundsPoints, LayerMask ignoreLayers, MeshFilter[] meshFilters = null)
         {
             if (meshFilters == null)
@@ -699,25 +760,15 @@ namespace RealityCollective.Extensions
         }
 
         /// <summary>
-        /// Transforms 'bounds' using the specified transform matrix.
+        /// Transforms <see cref="Bounds"/> using the specified transform matrix.
         /// </summary>
         /// <remarks>
-        /// Transforming a 'Bounds' instance means that the function will construct a new 'Bounds' 
-        /// instance which has its center translated using the translation information stored in
-        /// the specified matrix and its size adjusted to account for rotation and scale. The size
-        /// of the new 'Bounds' instance will be calculated in such a way that it will contain the
-        /// old 'Bounds'.
+        /// Transforming a <see cref="Bounds"/> instance means that the function will construct a new <see cref="Bounds"/> instance which has its center translated using the translation information stored in the specified matrix and its size adjusted to account for rotation and scale.
+        /// The size of the new <see cref="Bounds"/> instance will be calculated in such a way that it will contain the old <see cref="Bounds"/>.
         /// </remarks>
-        /// <param name="bounds">
-        /// The 'Bounds' instance which must be transformed.
-        /// </param>
-        /// <param name="transformMatrix">
-        /// The specified 'Bounds' instance will be transformed using this transform matrix. The function
-        /// assumes that the matrix doesn't contain any projection or skew transformation.
-        /// </param>
-        /// <returns>
-        /// The transformed 'Bounds' instance.
-        /// </returns>
+        /// <param name="bounds">The input bounding volume.</param>
+        /// <param name="transformMatrix">The specified <see cref="Bounds"/> instance will be transformed using this transform matrix. The function assumes that the matrix does not contain any projection or skew transformation.</param>
+        /// <returns>The transformed <see cref="Bounds"/> instance.</returns>
         public static Bounds Transform(this Bounds bounds, Matrix4x4 transformMatrix)
         {
             // We will need access to the right, up and look vector which are encoded inside the transform matrix
@@ -753,11 +804,9 @@ namespace RealityCollective.Extensions
         /// <summary>
         /// Returns the screen space corner points of the specified 'Bounds' instance.
         /// </summary>
-        /// <param name="bounds"></param>
-        /// <param name="camera">
-        /// The camera used for rendering to the screen. This is needed to perform the
-        /// transformation to screen space.
-        /// </param>
+        /// <param name="bounds">The input bounding volume.</param>
+        /// <param name="camera">The camera used for rendering to the screen. This is needed to perform the transformation to screen space.</param>
+        /// <returns>An array of screen points for the camera corners.</returns>
         public static Vector2[] GetScreenSpaceCornerPoints(this Bounds bounds, Camera camera)
         {
             var aabbCenter = bounds.center;
@@ -778,9 +827,13 @@ namespace RealityCollective.Extensions
             };
         }
 
+
         /// <summary>
         /// Returns the rectangle which encloses the specifies 'Bounds' instance in screen space.
         /// </summary>
+        /// <param name="bounds">The input bounding volume.</param>
+        /// <param name="camera">The camera volume to calculate bounds from.</param>
+        /// <returns>Returns a <see cref="Rect"/> for the encapsulated screen</returns>
         public static Rect GetScreenRectangle(this Bounds bounds, Camera camera)
         {
             // Retrieve the bounds' corner points in screen space
@@ -802,8 +855,8 @@ namespace RealityCollective.Extensions
         /// <summary>
         /// Returns the volume of the bounds.
         /// </summary>
-        /// <param name="bounds"></param>
-        /// <returns></returns>
+        /// <param name="bounds">The input bounding volume.</param>
+        /// <returns>A <see cref="float"/> representation of the volume.</returns>
         public static float Volume(this Bounds bounds)
         {
             return bounds.size.x * bounds.size.y * bounds.size.z;
@@ -812,9 +865,9 @@ namespace RealityCollective.Extensions
         /// <summary>
         /// Returns bounds that contain both this bounds and the bounds passed in.
         /// </summary>
-        /// <param name="originalBounds"></param>
-        /// <param name="otherBounds"></param>
-        /// <returns></returns>
+        /// <param name="originalBounds">The original bounding area.</param>
+        /// <param name="otherBounds">The additional bounded area to expand the original bounds with.</param>
+        /// <returns>Returns the collective <see cref="Bounds"/> volume.</returns>
         public static Bounds ExpandToContain(this Bounds originalBounds, Bounds otherBounds)
         {
             var tmpBounds = originalBounds;
@@ -825,8 +878,8 @@ namespace RealityCollective.Extensions
         /// <summary>
         /// Checks to see if bounds contains the other bounds completely.
         /// </summary>
-        /// <param name="bounds"></param>
-        /// <param name="otherBounds"></param>
+        /// <param name="bounds">The input bounding volume.</param>
+        /// <param name="otherBounds">The testing bounding volume for contact.</param>
         /// <returns></returns>
         public static bool ContainsBounds(this Bounds bounds, Bounds otherBounds)
         {
@@ -836,9 +889,9 @@ namespace RealityCollective.Extensions
         /// <summary>
         /// Checks to see whether point is closer to bounds or otherBounds
         /// </summary>
-        /// <param name="bounds"></param>
-        /// <param name="point"></param>
-        /// <param name="otherBounds"></param>
+        /// <param name="bounds">The input bounding volume.</param>
+        /// <param name="point">The point to test against.</param>
+        /// <param name="otherBounds">The comparative bounds volume to compare against.</param>
         /// <returns></returns>
         public static bool CloserToPoint(this Bounds bounds, Vector3 point, Bounds otherBounds)
         {
