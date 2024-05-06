@@ -245,5 +245,84 @@ namespace RealityCollective.Utilities.Extensions
                 throw new MissingReferenceException($"{Path.GetFileNameWithoutExtension(callerName)} is missing a {typeof(GameObject).Name} reference for {fieldName}");
             }
         }
+
+        /// <summary>
+        /// Gets a <see cref="Component"/> on the <see cref="GameObject"/> or any of its children, if the <see cref="Component"/> is already attached to it.
+        /// </summary>
+        /// <typeparam name="T">The type of the <see cref="Component"/> to lookup on the <see cref="GameObject"/>.</typeparam>
+        /// <param name="gameObject"><see cref="GameObject"/> instance.</param>
+        /// <param name="component">The <see cref="Component"/> instance found on <see cref="GameObject"/></param>
+        /// <returns>True if the Component was found on the GameObject or One of its children</returns>
+        /// <remarks>Will only return the first instance if there are multiple in the GameObject Hierarchy</remarks>
+        public static bool TryGetComponentInChildren<T>(this GameObject gameObject, out T component) where T : Component
+        {
+            if (gameObject.TryGetComponent<T>(out component))
+            {
+                return true;
+            }
+
+            foreach (Transform child in gameObject.transform)
+            {
+                if (child.gameObject.TryGetComponentInChildren<T>(out component))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Gets an array of <see cref="Component[]"/> attached to the <see cref="GameObject"/> or any of its children, if the <see cref="Component"/> is already attached to it.
+        /// </summary>
+        /// <typeparam name="T">The type of the <see cref="Component"/> to lookup on the <see cref="GameObject"/>.</typeparam>
+        /// <param name="gameObject"><see cref="GameObject"/> instance.</param>
+        /// <param name="component">The <see cref="Component"/> instance found on <see cref="GameObject"/></param>
+        /// <returns>True if the Component was found on the GameObject or One of its children</returns>
+        /// <remarks>Will only return the first instance if there are multiple in the GameObject Hierarchy</remarks>
+        public static bool TryGetComponentsInChildren<T>(this GameObject gameobject, out T[] components) where T : Component
+        {
+            List<T> componentsList = new List<T>();
+            if (gameobject.TryGetComponent<T>(out var component))
+            {
+                componentsList.Add(component);
+            }
+
+            foreach (Transform child in gameobject.transform)
+            {
+                if (child.gameObject.TryGetComponentsInChildren<T>(out var childComponents))
+                {
+                    componentsList.AddRange(childComponents);
+                }
+            }
+
+            if(componentsList.Count > 0)
+            {
+                components = componentsList.ToArray();
+                return true;
+            }
+            else
+            {
+                components = null;
+                return false;
+            }
+        }        
+
+        /// <summary>
+        /// Gets a <see cref="Component"/> on the <see cref="GameObject"/>, its parent or any of its children if it is already attached to it.
+        /// </summary>
+        /// <typeparam name="T">The type of the <see cref="Component"/> to lookup on the <see cref="GameObject"/>.</typeparam>
+        /// <param name="gameObject"><see cref="GameObject"/> instance.</param>
+        /// <param name="component">The <see cref="Component"/> instance found on <see cref="GameObject"/></param>
+        /// <returns>True if the Component was found on the GameObject or One of its children</returns>
+        /// <remarks>Will only return the first instance if there are multiple in the GameObject Hierarchy</remarks>
+        public static bool TryGetComponentInChildrenAndParent<T>(this GameObject input, out T component) where T : Component
+        {
+            if (input.transform.parent.IsNotNull() && input.transform.parent.gameObject.TryGetComponent<T>(out component))
+            {
+                return true;
+            }
+            return input.TryGetComponentInChildren<T>(out component);
+        }        
     }
 }
