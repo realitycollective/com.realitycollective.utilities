@@ -254,14 +254,14 @@ namespace RealityCollective.Utilities.Extensions
         /// <param name="component">The <see cref="Component"/> instance found on <see cref="GameObject"/></param>
         /// <returns>True if the Component was found on the GameObject or One of its children</returns>
         /// <remarks>Will only return the first instance if there are multiple in the GameObject Hierarchy</remarks>
-        public static bool TryGetComponentInChildren<T>(this GameObject gameobject, out T component) where T : Component
+        public static bool TryGetComponentInChildren<T>(this GameObject gameObject, out T component) where T : Component
         {
-            if (gameobject.TryGetComponent<T>(out component))
+            if (gameObject.TryGetComponent<T>(out component))
             {
                 return true;
             }
 
-            foreach (Transform child in gameobject.transform)
+            foreach (Transform child in gameObject.transform)
             {
                 if (child.gameObject.TryGetComponentInChildren<T>(out component))
                 {
@@ -318,16 +318,11 @@ namespace RealityCollective.Utilities.Extensions
         /// <remarks>Will only return the first instance if there are multiple in the GameObject Hierarchy</remarks>
         public static bool TryGetComponentInChildrenAndParent<T>(this GameObject input, out T component) where T : Component
         {
-            if (input.transform.parent != null && input.transform.parent.gameObject.TryGetComponent<T>(out component))
+            if (input.transform.parent.IsNotNull() && input.transform.parent.gameObject.TryGetComponent<T>(out component))
             {
                 return true;
             }
-            else if (input.TryGetComponentInChildren<T>(out component))
-            {
-                return true;
-            }
-
-            return false;
+            return input.TryGetComponentInChildren<T>(out component);
         }        
     }
 }
