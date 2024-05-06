@@ -1,12 +1,12 @@
 {
   "name": "com.realitycollective.utilities",
   "displayName": "RealityCollective.Utilities",
-  "description": "A collection of useful utilities for Unity Projects by the Reality Collective",
+  "description": "A collection of useful utilities for Unity Projects by the Reality Collective.",
   "keywords": [
     "Unity",
     "Tools"
   ],
-  "version": "1.0.9",
+  "version": "1.0.10-pre.2",
   "unity": "2020.3",
   "homepage": "https://realitycollective.io",
   "bugs": {

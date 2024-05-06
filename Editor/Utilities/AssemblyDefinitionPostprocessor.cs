@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace RealityCollective.Editor.Utilities
 {
-    internal class AssemblyDefinitionPreProcessor : AssetPostprocessor
+    internal class AssemblyDefinitionPostprocessor : AssetPostprocessor
     {
         [Serializable]
         private class PackageInfo
@@ -39,16 +39,21 @@ namespace RealityCollective.Editor.Utilities
                 var text = File.ReadAllText(assetPath);
                 var packageJson = JsonUtility.FromJson<PackageInfo>(text);
 
-                if (!packageJson.Name.Contains("com.xrtk"))
+                if (!packageJson.Name.Contains("com.realitycollective") &&
+                    !packageJson.Name.Contains("com.realitytoolkit"))
                 {
                     return;
                 }
 
                 var packageVersion = packageJson.Version;
 
-                if (packageVersion.Contains("-preview."))
+                if (packageVersion.Contains("-pre."))
                 {
+#if UNITY_2021_1_OR_NEWER                    
+                    packageVersion = packageVersion[..packageVersion.IndexOf("-", StringComparison.Ordinal)];
+#else
                     packageVersion = packageVersion.Substring(0, packageVersion.IndexOf("-", StringComparison.Ordinal));
+#endif
                 }
 
                 var newVersion = $"[assembly: AssemblyVersion(\"{packageVersion}\")]";
@@ -67,8 +72,8 @@ using System.Reflection;
 
 [assembly: AssemblyVersion(""0.0.0"")]
 [assembly: AssemblyTitle(""com.{assemblyName}"")]
-[assembly: AssemblyCompany(""XRTK"")]
-[assembly: AssemblyCopyright(""Copyright (c) XRTK. All rights reserved."")]
+[assembly: AssemblyCompany(""Reality Collective"")]
+[assembly: AssemblyCopyright(""Copyright (c) Reality Collective. All rights reserved."")]
 "
                         : File.ReadAllText(assemblyInfoPath);
 
