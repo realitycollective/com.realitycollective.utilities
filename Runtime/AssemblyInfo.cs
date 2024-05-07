@@ -3,7 +3,7 @@
 
 using System.Reflection;
 
-[assembly: AssemblyVersion("1.0.13")]
+[assembly: AssemblyVersion("1.0.12")]
 [assembly: AssemblyTitle("com.realitycollective.utilities")]
 [assembly: AssemblyCompany("Reality Collective")]
 [assembly: AssemblyCopyright("Copyright (c) Reality Collective. All rights reserved.")]
