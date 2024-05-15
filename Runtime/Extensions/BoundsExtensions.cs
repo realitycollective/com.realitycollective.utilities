@@ -984,6 +984,35 @@ namespace RealityCollective.Utilities.Extensions
             }
         }
 
+        /// <summary>
+        /// Returns the bounds of the model and all its contained meshes.
+        /// </summary>
+        /// <param name="bounds">The input bounding volume.</param>
+        /// <param name="transform">The target transform to inspect and calculate the bounds from.</param>
+        /// <param name="includeInactive">Should the mesh query also include inactive components/objects.</param>
+        /// <returns>Returns a <see cref="Bounds"/> object with the updated bounds (used to apply to the Size and Center points of a bounding volume)</returns>
+        public static Bounds CalculateBoundsForModel(this Bounds bounds, Transform transform, bool includeInactive = false)
+        {
+            var renderers = transform.GetComponentsInChildren<Renderer>(includeInactive);
+
+            if (renderers.Length > 0)
+            {
+                bounds = renderers[0].bounds;
+
+                for (int i = 1; i < renderers.Length; i++)
+                {
+                    bounds.Encapsulate(renderers[i].bounds);
+                }
+            }
+
+            foreach (Transform child in transform)
+            {
+                bounds.CalculateBoundsForModel(child);
+            }
+
+            return bounds;
+        }
+
         #endregion
 
         #region Private Static Functions

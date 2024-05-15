@@ -296,7 +296,7 @@ namespace RealityCollective.Utilities.Extensions
                 }
             }
 
-            if(componentsList.Count > 0)
+            if (componentsList.Count > 0)
             {
                 components = componentsList.ToArray();
                 return true;
@@ -306,7 +306,7 @@ namespace RealityCollective.Utilities.Extensions
                 components = null;
                 return false;
             }
-        }        
+        }
 
         /// <summary>
         /// Gets a <see cref="Component"/> on the <see cref="GameObject"/>, its parent or any of its children if it is already attached to it.
@@ -323,6 +323,28 @@ namespace RealityCollective.Utilities.Extensions
                 return true;
             }
             return input.TryGetComponentInChildren<T>(out component);
-        }        
+        }
+
+        /// <summary>
+        /// Gets a <see cref="Component"/> on the <see cref="GameObject"/>, or any parent in its hierarchy up to the root.
+        /// </summary>
+        /// <typeparam name="T">The type of the <see cref="Component"/> to lookup on the <see cref="GameObject"/>.</typeparam>
+        /// <param name="gameObject"><see cref="GameObject"/> instance.</param>
+        /// <param name="component">The <see cref="Component"/> instance found on <see cref="GameObject"/></param>
+        /// <returns>True if the Component was found on the GameObject or One of its parents</returns>
+        /// <remarks>Will only return the first instance if there are multiple in the GameObject Hierarchy</remarks>
+        public static bool TryGetComponentInParentHierarchy<T>(this GameObject input, out T component) where T : Component
+        {
+            if (input.TryGetComponent<T>(out component))
+            {
+                return true;
+            }
+            if (input.transform.parent.IsNull())
+            {
+                component = null;
+                return false;
+            }
+            return input.transform.parent.gameObject.TryGetComponentInParentHierarchy<T>(out component);
+        }
     }
 }
