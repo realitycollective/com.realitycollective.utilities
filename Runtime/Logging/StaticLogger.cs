@@ -56,7 +56,7 @@ namespace RealityCollective.Utilities.Logging
         /// <summary>
         /// The template to wrap logs in.
         /// </summary>
-        public static string wrapTemplate { get; set; } = $"----------{Application.productName} - {Application.version}----------";
+        public static string WrapTemplate { get; set; } = $"----------{Application.productName} - {Application.version}----------";
         #endregion Public Properties
 
         #region Public Methods
@@ -81,15 +81,15 @@ namespace RealityCollective.Utilities.Logging
             {
                 if (!appLog)
                 {
-                    if (WrapLog) Console.WriteLine(wrapTemplate);
+                    if (WrapLog) { Console.WriteLine(WrapTemplate); }
                     Console.WriteLine(message);
-                    if (WrapLog) Console.WriteLine(wrapTemplate);
+                    if (WrapLog) { Console.WriteLine(WrapTemplate); }
 
                     if (DebugMode)
                     {
-                        if (WrapLog) Debug.LogFormat(logType, includeStackTrace ? LogOption.None : LogOption.NoStacktrace, null, wrapTemplate);
+                        if (WrapLog) { Debug.LogFormat(logType, includeStackTrace ? LogOption.None : LogOption.NoStacktrace, null, WrapTemplate); }
                         Debug.LogFormat(logType, includeStackTrace ? LogOption.None : LogOption.NoStacktrace, null, message);
-                        if (WrapLog) Debug.LogFormat(logType, includeStackTrace ? LogOption.None : LogOption.NoStacktrace, null, wrapTemplate);
+                        if (WrapLog) { Debug.LogFormat(logType, includeStackTrace ? LogOption.None : LogOption.NoStacktrace, null, WrapTemplate); }
                     }
                     return;
                 }
