@@ -47,6 +47,16 @@ namespace RealityCollective.Utilities.Logging
         /// Should logs be written to the Unity debugger.
         /// </summary>
         public static bool DebugMode { get; set; }
+
+        /// <summary>
+        /// Should logs be wrapped in a template.
+        /// </summary>
+        public static bool WrapLog { get; set; }
+
+        /// <summary>
+        /// The template to wrap logs in.
+        /// </summary>
+        public static string wrapTemplate { get; set; } = $"----------{Application.productName} - {Application.version}----------";
         #endregion Public Properties
 
         #region Public Methods
@@ -71,10 +81,15 @@ namespace RealityCollective.Utilities.Logging
             {
                 if (!appLog)
                 {
+                    if (WrapLog) Console.WriteLine(wrapTemplate);
                     Console.WriteLine(message);
+                    if (WrapLog) Console.WriteLine(wrapTemplate);
+
                     if (DebugMode)
                     {
+                        if (WrapLog) Debug.LogFormat(logType, includeStackTrace ? LogOption.None : LogOption.NoStacktrace, null, wrapTemplate);
                         Debug.LogFormat(logType, includeStackTrace ? LogOption.None : LogOption.NoStacktrace, null, message);
+                        if (WrapLog) Debug.LogFormat(logType, includeStackTrace ? LogOption.None : LogOption.NoStacktrace, null, wrapTemplate);
                     }
                     return;
                 }
