@@ -112,12 +112,44 @@ namespace RealityCollective.Utilities.Extensions
         /// Find the first component of type <typeparamref name="T"/> in the ancestors of the specified game object.
         /// </summary>
         /// <typeparam name="T">Type of component to find.</typeparam>
-        /// <param name="gameObject">Game object for which ancestors must be considered.</param>
+        /// <param name="input">Game object for which ancestors must be considered.</param>
         /// <param name="includeSelf">Indicates whether the specified game object should be included.</param>
         /// <returns>The component of type <typeparamref name="T"/>. Null if it none was found.</returns>
-        public static T FindAncestorComponent<T>(this GameObject gameObject, bool includeSelf = true) where T : Component
+        public static T FindAncestorComponent<T>(this GameObject input, bool includeSelf = true)
         {
-            return gameObject.transform.FindAncestorComponent<T>(includeSelf);
+            if (includeSelf && input.TryGetComponent<T>(out var component))
+            {
+                return component;
+            }
+            if (input.transform.parent.IsNull())
+            {
+                return default(T);
+            }
+
+            return input.transform.parent.gameObject.FindAncestorComponent<T>(true);
+        }
+
+        /// <summary>
+        /// Gets a <see cref="Component"/> on the <see cref="GameObject"/>, or any parent in its hierarchy up to the root.
+        /// </summary>
+        /// <typeparam name="T">The type of the <see cref="Component"/> to lookup on the <see cref="GameObject"/>.</typeparam>
+        /// <param name="input"><see cref="GameObject"/> instance.</param>
+        /// <param name="component">The <see cref="Component"/> instance found on <see cref="GameObject"/></param>
+        /// <param name="includeSelf">Indicates whether the specified game object should be included.</param>
+        /// <returns>True if the Component was found on the GameObject or One of its parents</returns>
+        /// <remarks>Will only return the first instance if there are multiple in the GameObject Hierarchy</remarks>
+        public static bool TryFindAncestorComponent<T>(this GameObject input, out T component, bool includeSelf = true)
+        {
+            if (includeSelf && input.TryGetComponent<T>(out component))
+            {
+                return true;
+            }
+            if (input.transform.parent.IsNull())
+            {
+                component = default(T);
+                return false;
+            }
+            return input.transform.parent.gameObject.TryFindAncestorComponent<T>(out component, true);
         }
 
         /// <summary>
@@ -254,7 +286,7 @@ namespace RealityCollective.Utilities.Extensions
         /// <param name="component">The <see cref="Component"/> instance found on <see cref="GameObject"/></param>
         /// <returns>True if the Component was found on the GameObject or One of its children</returns>
         /// <remarks>Will only return the first instance if there are multiple in the GameObject Hierarchy</remarks>
-        public static bool TryGetComponentInChildren<T>(this GameObject gameObject, out T component) where T : Component
+        public static bool TryGetComponentInChildren<T>(this GameObject gameObject, out T component)
         {
             if (gameObject.TryGetComponent<T>(out component))
             {
@@ -280,7 +312,7 @@ namespace RealityCollective.Utilities.Extensions
         /// <param name="component">The <see cref="Component"/> instance found on <see cref="GameObject"/></param>
         /// <returns>True if the Component was found on the GameObject or One of its children</returns>
         /// <remarks>Will only return the first instance if there are multiple in the GameObject Hierarchy</remarks>
-        public static bool TryGetComponentsInChildren<T>(this GameObject gameobject, out T[] components) where T : Component
+        public static bool TryGetComponentsInChildren<T>(this GameObject gameobject, out T[] components)
         {
             List<T> componentsList = new List<T>();
             if (gameobject.TryGetComponent<T>(out var component))
@@ -316,35 +348,13 @@ namespace RealityCollective.Utilities.Extensions
         /// <param name="component">The <see cref="Component"/> instance found on <see cref="GameObject"/></param>
         /// <returns>True if the Component was found on the GameObject or One of its children</returns>
         /// <remarks>Will only return the first instance if there are multiple in the GameObject Hierarchy</remarks>
-        public static bool TryGetComponentInChildrenAndParent<T>(this GameObject input, out T component) where T : Component
+        public static bool TryGetComponentInChildrenAndParent<T>(this GameObject input, out T component)
         {
             if (input.transform.parent.IsNotNull() && input.transform.parent.gameObject.TryGetComponent<T>(out component))
             {
                 return true;
             }
             return input.TryGetComponentInChildren<T>(out component);
-        }
-
-        /// <summary>
-        /// Gets a <see cref="Component"/> on the <see cref="GameObject"/>, or any parent in its hierarchy up to the root.
-        /// </summary>
-        /// <typeparam name="T">The type of the <see cref="Component"/> to lookup on the <see cref="GameObject"/>.</typeparam>
-        /// <param name="gameObject"><see cref="GameObject"/> instance.</param>
-        /// <param name="component">The <see cref="Component"/> instance found on <see cref="GameObject"/></param>
-        /// <returns>True if the Component was found on the GameObject or One of its parents</returns>
-        /// <remarks>Will only return the first instance if there are multiple in the GameObject Hierarchy</remarks>
-        public static bool TryGetComponentInParentHierarchy<T>(this GameObject input, out T component) where T : Component
-        {
-            if (input.TryGetComponent<T>(out component))
-            {
-                return true;
-            }
-            if (input.transform.parent.IsNull())
-            {
-                component = null;
-                return false;
-            }
-            return input.transform.parent.gameObject.TryGetComponentInParentHierarchy<T>(out component);
         }
     }
 }
