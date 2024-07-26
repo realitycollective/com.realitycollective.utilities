@@ -68,7 +68,7 @@ The Utilities package includes a well-formed logging solution that is single ins
 ## Requirements
 <!-- Fill in list of requirements here -->
 
-* [Unity 2021.3 and above](https://unity.com/)
+* [Unity 2022.3 and above](https://unity.com/)
 
 ### OpenUPM
 
