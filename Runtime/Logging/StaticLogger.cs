@@ -94,7 +94,14 @@ namespace RealityCollective.Utilities.Logging
 
                     if (DebugMode)
                     {
-                        Debug.LogFormat(logType, includeStackTrace ? LogOption.None : LogOption.NoStacktrace, null, WrapLog ? lf.ToString() : message);
+                        try
+                        {
+                            Debug.LogFormat(logType, includeStackTrace ? LogOption.None : LogOption.NoStacktrace, null, WrapLog ? lf.ToString() : message);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError($"Error logging message: {e.Message}-{message}");
+                        }
                     }
                     return;
                 }
