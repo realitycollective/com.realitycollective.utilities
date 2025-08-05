@@ -437,5 +437,86 @@ namespace RealityCollective.Utilities.Extensions
         {
             return (source + point) * 0.5f;
         }
+
+        #region Euler Angle Utilities (from Ethar Foundation)
+
+        /// <summary>
+        /// Normalizes Euler angles to the range [-180, 180] to ensure consistent serialization.
+        /// This helps prevent rotation drift when converting between Quaternion and Euler angles.
+        /// </summary>
+        /// <param name="euler">The Euler angles to normalize</param>
+        /// <returns>Normalized Euler angles in the range [-180, 180]</returns>
+        public static Vector3 NormalizeEulerAngles(this Vector3 euler)
+        {
+            return new Vector3(
+                NormalizeAngle(euler.x),
+                NormalizeAngle(euler.y),
+                NormalizeAngle(euler.z)
+            );
+        }
+
+        /// <summary>
+        /// Normalizes a single angle to the range [-180, 180].
+        /// </summary>
+        /// <param name="angle">The angle to normalize</param>
+        /// <returns>Normalized angle in the range [-180, 180]</returns>
+        public static float NormalizeAngle(float angle)
+        {
+            while (angle > 180f)
+                angle -= 360f;
+            while (angle < -180f)
+                angle += 360f;
+            return angle;
+        }
+
+        /// <summary>
+        /// Checks if two Vector3 Euler angles are nearly equal within a tolerance.
+        /// </summary>
+        /// <param name="euler1">The first Euler angles</param>
+        /// <param name="euler2">The second Euler angles</param>
+        /// <param name="tolerance">The tolerance in degrees (default: 0.001)</param>
+        /// <returns>True if the Euler angles are nearly equal</returns>
+        public static bool IsNearlyEqualEuler(this Vector3 euler1, Vector3 euler2, float tolerance = 0.001f)
+        {
+            var normalized1 = euler1.NormalizeEulerAngles();
+            var normalized2 = euler2.NormalizeEulerAngles();
+            
+            return Mathf.Abs(normalized1.x - normalized2.x) <= tolerance &&
+                   Mathf.Abs(normalized1.y - normalized2.y) <= tolerance &&
+                   Mathf.Abs(normalized1.z - normalized2.z) <= tolerance;
+        }
+
+        /// <summary>
+        /// Calculates the angular difference between two Vector3 Euler angles.
+        /// </summary>
+        /// <param name="euler1">The first Euler angles</param>
+        /// <param name="euler2">The second Euler angles</param>
+        /// <returns>A Vector3 containing the angular differences for each axis</returns>
+        public static Vector3 AngleDifference(this Vector3 euler1, Vector3 euler2)
+        {
+            var normalized1 = euler1.NormalizeEulerAngles();
+            var normalized2 = euler2.NormalizeEulerAngles();
+            
+            return new Vector3(
+                NormalizeAngle(normalized1.x - normalized2.x),
+                NormalizeAngle(normalized1.y - normalized2.y),
+                NormalizeAngle(normalized1.z - normalized2.z)
+            );
+        }
+
+        /// <summary>
+        /// Gets the maximum angular difference across all axes between two Vector3 Euler angles.
+        /// </summary>
+        /// <param name="euler1">The first Euler angles</param>
+        /// <param name="euler2">The second Euler angles</param>
+        /// <returns>The maximum angular difference in degrees</returns>
+        public static float MaxAngleDifference(this Vector3 euler1, Vector3 euler2)
+        {
+            var differences = euler1.AngleDifference(euler2);
+            return Mathf.Max(Mathf.Abs(differences.x), Mathf.Abs(differences.y), Mathf.Abs(differences.z));
+        }
+
+        #endregion
+
     }
 }
