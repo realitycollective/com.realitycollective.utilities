@@ -120,6 +120,12 @@ namespace RealityCollective.Utilities.Extensions
         }
 
         /// <summary>
+        /// A precision-normalized identity quaternion that avoids floating-point errors.
+        /// Use this instead of Quaternion.identity when rotation precision is critical.
+        /// </summary>
+        public static readonly Quaternion NormalizedIdentity = Vector3.zero.ToNormalizedQuaternion();
+
+        /// <summary>
         /// Detects if a quaternion is in a gimbal lock scenario where Euler angle extraction is problematic.
         /// </summary>
         /// <param name="quaternion">The quaternion to check</param>

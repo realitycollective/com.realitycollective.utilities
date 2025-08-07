@@ -1,7 +1,9 @@
 // Copyright (c) Reality Collective. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UIElements;
 
 namespace RealityCollective.Utilities.Extensions
@@ -113,6 +115,58 @@ namespace RealityCollective.Utilities.Extensions
                 inputText.style.color = Color.red;
             }
             return isValidEmail;
+        }
+
+        /// <summary>
+        /// Creates a button with the specified text and click action.
+        /// </summary>
+        /// <param name="parent">The parent element to add the button to</param>
+        /// <param name="text">The text content for the button</param>
+        /// <param name="onClickAction">The action to perform when the button is clicked</param>
+        /// <param name="isInitiallyVisible">Whether the button is visible initially</param>
+        /// <param name="className">Optional CSS class name to apply to the button</param>
+        /// <returns>A new Button element</returns>
+        public static Button CreateButton(VisualElement parent, string text, UnityEvent onClickAction, bool isInitiallyVisible = true, string className = null)
+        {
+            Button button;
+            if (string.IsNullOrEmpty(className))
+            {
+                button = CreateVisualElement<Button>(parent);
+            }
+            else
+            {
+                button = CreateVisualElement<Button>(parent, className);
+            }
+            button.text = text;
+            button.clicked += () => onClickAction?.Invoke();
+            button.style.display = isInitiallyVisible ? DisplayStyle.Flex : DisplayStyle.None;
+            return button;
+        }
+
+        /// <summary>
+        /// Creates a button with the specified text and click action.
+        /// </summary>
+        /// <param name="parent">The parent element to add the button to</param>
+        /// <param name="text">The text content for the button</param>
+        /// <param name="onClickAction">The action to perform when the button is clicked</param>
+        /// <param name="isInitiallyVisible">Whether the button is visible initially</param>
+        /// <param name="className">Optional CSS class name to apply to the button</param>
+        /// <returns>A new Button element</returns>
+        public static Button CreateButton(VisualElement parent, string text, Action onClickAction, bool isInitiallyVisible = true, string className = null)
+        {
+            Button button;
+            if (string.IsNullOrEmpty(className))
+            {
+                button = CreateVisualElement<Button>(parent);
+            }
+            else
+            {
+                button = CreateVisualElement<Button>(parent, className);
+            }
+            button.text = text;
+            button.clicked += () => onClickAction?.Invoke();
+            button.style.display = isInitiallyVisible ? DisplayStyle.Flex : DisplayStyle.None;
+            return button;
         }
     }
 }
