@@ -1005,11 +1005,6 @@ namespace RealityCollective.Utilities.Extensions
                 }
             }
 
-            foreach (Transform child in transform)
-            {
-                bounds.CalculateBoundsForModel(child);
-            }
-
             return bounds;
         }
 
