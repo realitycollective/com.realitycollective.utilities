@@ -27,6 +27,7 @@ namespace RealityCollective.Utilities.Logging
 
         #region Private Properties
         private static StringBuilder sb = new StringBuilder();
+        private static StringBuilder lf = new StringBuilder();
         private static int logIndex = 0;
         private static FilterLogType currentLogFilter = FilterLogType.All;
         private static bool pauseLog = false;
@@ -81,15 +82,26 @@ namespace RealityCollective.Utilities.Logging
             {
                 if (!appLog)
                 {
-                    if (WrapLog) { Console.WriteLine(WrapTemplate); }
-                    Console.WriteLine(message);
-                    if (WrapLog) { Console.WriteLine(WrapTemplate); }
+                    if (WrapLog)
+                    {
+                        lf.Clear();
+                        lf.AppendLine(WrapTemplate);
+                        lf.AppendLine(message);
+                        lf.AppendLine(WrapTemplate);
+                    }
+
+                    Console.WriteLine(WrapLog ? lf.ToString() : message);
 
                     if (DebugMode)
                     {
-                        if (WrapLog) { Debug.LogFormat(logType, includeStackTrace ? LogOption.None : LogOption.NoStacktrace, null, WrapTemplate); }
-                        Debug.LogFormat(logType, includeStackTrace ? LogOption.None : LogOption.NoStacktrace, null, message);
-                        if (WrapLog) { Debug.LogFormat(logType, includeStackTrace ? LogOption.None : LogOption.NoStacktrace, null, WrapTemplate); }
+                        try
+                        {
+                            Debug.LogFormat(logType, includeStackTrace ? LogOption.None : LogOption.NoStacktrace, null, WrapLog ? lf.ToString() : message);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError($"Error logging message: {e.Message}-{message}");
+                        }
                     }
                     return;
                 }
