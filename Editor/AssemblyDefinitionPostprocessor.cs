@@ -49,11 +49,7 @@ namespace RealityCollective.Utilities.Editor
 
                 if (packageVersion.Contains("-pre."))
                 {
-#if UNITY_2021_1_OR_NEWER                    
                     packageVersion = packageVersion[..packageVersion.IndexOf("-", StringComparison.Ordinal)];
-#else
-                    packageVersion = packageVersion.Substring(0, packageVersion.IndexOf("-", StringComparison.Ordinal));
-#endif
                 }
 
                 var newVersion = $"[assembly: AssemblyVersion(\"{packageVersion}\")]";

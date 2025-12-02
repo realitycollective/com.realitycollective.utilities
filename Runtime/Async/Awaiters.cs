@@ -90,7 +90,7 @@ namespace RealityCollective.Utilities.Async
                     {
                         if (!predicate(element))
                         {
-                            await Task.Delay(1, cancellationTokenSource.Token);
+                            await Task.Delay(1, cancellationTokenSource.Token).ConfigureAwait(false);
                             continue;
                         }
                     }
@@ -129,7 +129,7 @@ namespace RealityCollective.Utilities.Async
                 {
                     if (!predicate(element))
                     {
-                        await Task.Delay(1);
+                        await Task.Delay(1).ConfigureAwait(false);
                         continue;
                     }
                 }
