@@ -1,5 +1,5 @@
 // Copyright (c) Reality Collective. All rights reserved.
-
+#if UNITY_2021_1_OR_NEWER
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -93,3 +93,4 @@ namespace RealityCollective.Utilities
         #endregion Dynamic Cache
     }
 }
+#endif
