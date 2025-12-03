@@ -1,7 +1,5 @@
 // Copyright (c) Reality Collective. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
-#if UNITY_2022_1_OR_NEWER
-
 using System;
 using UnityEngine;
 using UnityEngine.Events;
@@ -171,4 +169,3 @@ namespace RealityCollective.Utilities.Extensions
         }
     }
 }
-#endif

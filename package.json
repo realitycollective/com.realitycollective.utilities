@@ -2,7 +2,7 @@
   "name": "com.realitycollective.utilities",
   "displayName": "RealityCollective.Utilities",
   "description": "A collection of useful utilities for Unity projects by the Reality Collective.",
-  "version": "1.0.16",
+  "version": "2.0.0-pre.0",
   "documentationUrl": "https://www.realitycollective.net/",
   "changelogUrl": "https://github.com/realitycollective/com.realitytoolkit.utilities/releases",
   "licensesUrl": "https://github.com/realitycollective/com.realitycollective.utilities/blob/main/LICENSE.md",
@@ -12,7 +12,7 @@
     "Tools",
     "Utilities"
   ],
-  "unity": "2020.3",
+  "unity": "6000.0",
   "homepage": "https://www.realitycollective.net/",
   "bugs": {
     "url": "https://github.com/realitycollective/com.realitycollective.utilities/issues"
